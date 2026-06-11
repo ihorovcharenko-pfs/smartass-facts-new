@@ -1,8 +1,24 @@
 import type { Metadata } from 'next'
+import { Inter, Space_Grotesk } from 'next/font/google'
 import '../styles/index.scss'
 import Providers from '../components/Providers'
 import Analytics from '../components/Analytics'
 import ServiceWorkerRegister from '../components/ServiceWorkerRegister'
+
+// Self-hosted (no external Google request) + display:swap so text paints
+// instantly in a fallback and swaps when the webfont arrives. Exposed as CSS
+// variables consumed throughout the SCSS (var(--font-inter) / --font-space-grotesk).
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'SmartAss Facts — Fake or Fact Trivia Game',
@@ -14,16 +30,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
-        {/* Pre-warm the connections the first paint needs */}
+        {/* Pre-warm the API connection the first data fetch needs. Fonts are now
+            self-hosted (next/font), so no fonts.googleapis/gstatic preconnects. */}
         <link rel="preconnect" href="https://api.smartassfacts.com" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-        />
       </head>
       <body>
         {/* Google Tag Manager (noscript) */}

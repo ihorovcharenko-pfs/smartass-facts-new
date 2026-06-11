@@ -39,7 +39,7 @@
 }
 
 .results-screen__title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--color-text);
@@ -164,7 +164,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   border: none;
 
   &--primary {
@@ -217,7 +217,7 @@
   color: var(--color-text);
   font-size: 0.9375rem;
   font-weight: 600;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
   margin-top: 0.25rem;

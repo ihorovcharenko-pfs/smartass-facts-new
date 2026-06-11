@@ -17,7 +17,7 @@
 
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-weight: 400;
   line-height: 1.6;
   overflow-x: hidden;
@@ -30,7 +30,7 @@
     gap: 9px;
     background: var(--color-primary);
     color: #fff;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: 0.875rem;
     font-weight: 500;
     padding: 11px 26px;
@@ -67,7 +67,7 @@
 
   /* Section shared */
   .sec-title {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: clamp(30px, 3.5vw, 46px);
     font-weight: 400;
     letter-spacing: -0.025em;
@@ -91,7 +91,7 @@
     overflow: hidden;
   }
   .hero h1 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: clamp(38px, 5.5vw, 68px);
     font-weight: 400;
     letter-spacing: -0.03em;
@@ -235,7 +235,7 @@
     align-items: center;
   }
   .vision-text h3 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: 1.15rem;
     font-weight: 400;
     margin-bottom: 22px;
@@ -381,7 +381,7 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   }
   .belief h3 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: 1.1rem;
     font-weight: 400;
     letter-spacing: -0.01em;
@@ -477,7 +477,7 @@
     text-align: center;
   }
   .cta-box h2 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: clamp(28px, 3.5vw, 44px);
     font-weight: 400;
     letter-spacing: -0.02em;

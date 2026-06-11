@@ -28,11 +28,11 @@
     font-weight: 600;
     letter-spacing: 0.03em;
     margin-bottom: 1.25rem;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
   }
 
   &__hero-heading {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: clamp(2.25rem, 6vw, 3.5rem);
     font-weight: 700;
     color: var(--color-text);
@@ -118,7 +118,7 @@
   }
 
   &__section-heading {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: 0.6875rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -140,7 +140,7 @@
     transition: background-color 0.15s, color 0.15s;
     font-size: 0.9375rem;
     font-weight: 500;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
 
     &:hover {
       background-color: var(--color-surface-2);
@@ -205,7 +205,7 @@
   &__category-name {
     font-size: 0.9375rem;
     font-weight: 500;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
   }
 }
 
@@ -270,7 +270,7 @@
   }
 
   &__title {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: 0.9375rem;
     font-weight: 600;
     color: var(--color-text);
@@ -289,7 +289,7 @@
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     cursor: pointer;
     white-space: nowrap;
     display: flex;
@@ -336,7 +336,7 @@
     font-size: 0.75rem;
     font-weight: 700;
     color: #ffffff;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
   }
 
   &__flag-icon {

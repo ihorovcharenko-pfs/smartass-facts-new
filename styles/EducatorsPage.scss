@@ -2,7 +2,7 @@
   min-height: 100vh;
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 // ── Reveal animation ─────────────────────────────────────────────────────────
@@ -66,7 +66,7 @@
 }
 
 .edu-hero__h1 {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 400;
   color: var(--color-text);
@@ -96,7 +96,7 @@
   align-items: center;
   gap: 0.5rem;
   border-radius: 999px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -172,7 +172,7 @@
 }
 
 .edu-section__title {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-weight: 400;
   color: var(--color-text);
@@ -353,7 +353,7 @@
   background: transparent;
   border: none;
   color: var(--color-text);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -398,7 +398,7 @@
   gap: 1rem;
 
   h2 {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), sans-serif;
     font-size: clamp(1.4rem, 3vw, 1.8rem);
     font-weight: 400;
     color: var(--color-text);

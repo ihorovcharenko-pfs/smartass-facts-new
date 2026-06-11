@@ -203,8 +203,10 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                 const isGameOfTheDay = category.saCategory.toLowerCase() === 'game of the day' || category.category.toLowerCase() === 'game of the day'
                 const isFavourite = favouriteCategories.includes(category.id)
                 const imgSrc = getCategoryImage(category.saCategory, category.imageUrl)
-                // First 6 images are likely above the fold — load eagerly; rest are lazy
-                const isAboveFold = index < 6
+                // Only the very first card is eager (on mobile the whole grid is
+                // below the hero fold). Eager-loading more floods the network and
+                // delays the real LCP element. The rest lazy-load near the viewport.
+                const isAboveFold = index === 0
                 return (
                   <div
                     key={category.id}
