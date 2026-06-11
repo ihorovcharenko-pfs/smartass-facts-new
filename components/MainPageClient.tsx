@@ -203,9 +203,9 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                 const isGameOfTheDay = category.saCategory.toLowerCase() === 'game of the day' || category.category.toLowerCase() === 'game of the day'
                 const isFavourite = favouriteCategories.includes(category.id)
                 const imgSrc = getCategoryImage(category.saCategory, category.imageUrl)
-                // All category cards sit below the hero fold on mobile and none is
-                // the LCP element (that's the hero <h1>), so they all lazy-load —
-                // keeping the critical path clear for CSS/JS/fonts.
+                // The first card (Game of the day) is the LCP element on mobile, so it
+                // loads eagerly with high priority. The rest lazy-load below the fold.
+                const isLcpImage = index === 0
                 return (
                   <div
                     key={category.id}
@@ -227,8 +227,9 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                           className="category-card__image"
                           width={400}
                           height={300}
-                          loading="lazy"
+                          loading={isLcpImage ? 'eager' : 'lazy'}
                           decoding="async"
+                          fetchPriority={isLcpImage ? 'high' : 'auto'}
                           onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                         />
                       ) : (
