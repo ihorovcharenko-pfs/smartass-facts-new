@@ -1,0 +1,15 @@
+// Route path constants. In the old Vite SPA these lived in Router.tsx; with
+// Next's file-system routing that router is gone, so the constants live here.
+export const PRIVACY_PATH = '/privacy'
+export const TERMS_PATH = '/terms'
+export const COOKIE_PATH = '/cookies'
+export const ABOUT_PATH = '/about'
+export const FAQ_PATH = '/faq'
+export const HOW_PATH = '/how-it-works'
+export const LEADERBOARD_PATH = '/leaderboard'
+export const ROOM_PATH = '/room'
+export const MYTHS_PATH = '/myths'
+export const FACTS_PATH = '/facts'
+export const RANDOM_PATH = '/random'
+export const VS_PATH = '/vs'
+export const EDUCATORS_PATH = '/educators'

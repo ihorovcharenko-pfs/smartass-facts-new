@@ -1,0 +1,85 @@
+// ─── Push notification prompt card ───────────────────────────────────────────
+.push-prompt {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #f8f8f8;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 1rem 1rem 1rem 1rem;
+  width: 100%;
+  margin-top: 0.75rem;
+  text-align: left;
+}
+
+.push-prompt__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.push-prompt__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.push-prompt__title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #171717;
+  margin: 0 0 0.2rem;
+}
+
+.push-prompt__sub {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+}
+
+.push-prompt__ios-note {
+  font-size: 0.75rem;
+  color: #999;
+  margin: 0 0 0.75rem;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.push-prompt__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.push-prompt__btn {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+
+  &:active { transform: scale(0.97) }
+
+  &--primary {
+    background: #171717;
+    color: #fff;
+    &:hover { background: #3a3a3a }
+    &:disabled { opacity: 0.5; cursor: not-allowed }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: #999;
+    &:hover { color: #555 }
+  }
+}
+
+.push-prompt__status {
+  font-size: 0.8rem;
+  color: #2e7d32;
+  font-weight: 600;
+  padding: 4px 0;
+}

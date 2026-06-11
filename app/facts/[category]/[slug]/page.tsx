@@ -1,0 +1,50 @@
+// /facts/[category]/[slug] — server-rendered single fact page (the long-tail SEO
+// pages). Fetches the fact AND decrypts its answer on the server, so the full
+// statement + verdict are in the initial HTML.
+import type { Metadata } from 'next'
+import FactDetailPage from '@/components/FactDetailPage'
+import { getFactByIdServer } from '@/services/serverData'
+import { decryptAnswer } from '@/utils/decryption'
+
+type Params = { params: Promise<{ category: string; slug: string }> }
+
+const parseId = (slug: string) => parseInt(slug.split('-')[0], 10)
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { category, slug } = await params
+  const id = parseId(slug)
+  if (isNaN(id)) return { title: 'Fact not found | SmartAss Facts' }
+  const data = await getFactByIdServer(id)
+  if (!data) return { title: 'Fact not found | SmartAss Facts' }
+  return {
+    title: `${data.fact.saFact} | SmartAss Facts`,
+    description: data.fact.explanation?.slice(0, 155) || undefined,
+    alternates: { canonical: `https://smartassfacts.com/facts/${category}/${slug}/` },
+  }
+}
+
+export default async function Page({ params }: Params) {
+  const { category, slug } = await params
+  const id = parseId(slug)
+  // getFactByIdServer here hits the same cached/memoized fetch as generateMetadata.
+  const data = isNaN(id) ? null : await getFactByIdServer(id)
+
+  let initialIsReal: boolean | null = null
+  if (data) {
+    try {
+      initialIsReal = await decryptAnswer(data.fact.answer)
+    } catch {
+      initialIsReal = null
+    }
+  }
+
+  return (
+    <FactDetailPage
+      categorySlug={category}
+      factSlug={slug}
+      initialFact={data?.fact ?? null}
+      initialRelated={data?.related ?? []}
+      initialIsReal={initialIsReal}
+    />
+  )
+}

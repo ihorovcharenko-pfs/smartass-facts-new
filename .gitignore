@@ -23,6 +23,10 @@
 # misc
 .DS_Store
 *.pem
+# Google Drive folder-icon junk (this repo lives in a synced GDrive folder)
+Icon?
+Icon
+
 
 # debug
 npm-debug.log*

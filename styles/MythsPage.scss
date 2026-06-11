@@ -1,0 +1,266 @@
+.myths-page {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.myths-hero {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.myths-hero__inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 56px 64px 60px;
+
+  @media (max-width: 768px) { padding: 40px 24px 48px; }
+}
+.myths-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 28px;
+
+  a { color: var(--color-text-muted); text-decoration: none; &:hover { color: var(--color-primary); } }
+}
+.myths-hero__icon {
+  font-size: 2.8rem;
+  margin-bottom: 16px;
+}
+.myths-hero__h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+.myths-hero__sub {
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  margin-bottom: 18px;
+  line-height: 1.6;
+  max-width: 640px;
+}
+.myths-hero__body {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  max-width: 640px;
+  margin-bottom: 36px;
+}
+
+/* ── Stats ────────────────────────────────────────────────────── */
+.myths-stats {
+  display: flex;
+  gap: 0;
+  margin-bottom: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  overflow: hidden;
+  width: fit-content;
+}
+.myths-stat {
+  padding: 16px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  & + & { border-left: 1px solid var(--color-border); }
+
+  &__num {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+  &__label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) { padding: 12px 20px; }
+}
+
+/* ── Play button ──────────────────────────────────────────────── */
+.myths-play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(240, 96, 48, 0.35);
+  }
+}
+
+/* ── Grid ─────────────────────────────────────────────────────── */
+.myths-grid-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 56px 64px;
+
+  @media (max-width: 768px) { padding: 40px 24px; }
+}
+.myths-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 640px) { grid-template-columns: 1fr; }
+}
+.myth-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: var(--color-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &__emoji {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  &__body { flex: 1; min-width: 0; }
+  &__badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-fake);
+    background: rgba(239, 83, 80, 0.12);
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-bottom: 6px;
+  }
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 5px;
+    line-height: 1.35;
+  }
+  &__desc {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+/* ── FAQ ──────────────────────────────────────────────────────── */
+.myths-faq {
+  border-top: 1px solid var(--color-border);
+}
+.myths-faq__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 64px;
+
+  @media (max-width: 768px) { padding: 48px 24px; }
+}
+.myths-faq__heading {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+.myths-faq__list { display: flex; flex-direction: column; }
+.myths-faq__item {
+  border-top: 1px solid var(--color-border);
+  &:last-child { border-bottom: 1px solid var(--color-border); }
+}
+.myths-faq__q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1.125rem 0;
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.975rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  gap: 1rem;
+
+  &:hover { color: var(--color-primary); }
+}
+.myths-faq__chevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform 0.2s;
+
+  &--open { transform: rotate(180deg); }
+}
+.myths-faq__a {
+  padding: 0 0 1.125rem;
+
+  p {
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+}
+
+/* ── CTA ──────────────────────────────────────────────────────── */
+.myths-cta {
+  padding: 0 64px 80px;
+
+  @media (max-width: 768px) { padding: 0 24px 60px; }
+}
+.myths-cta__box {
+  max-width: 860px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  padding: 56px 60px;
+  text-align: center;
+
+  h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(26px, 3vw, 40px);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin: 0 auto 28px;
+    max-width: 360px;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 768px) { padding: 40px 28px; }
+}

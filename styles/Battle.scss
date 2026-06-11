@@ -1,0 +1,257 @@
+// ─── Battle intro (loading / error / challenge card) ─────────────────────────
+.battle-intro {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  background: #fafafa;
+  text-align: center;
+  gap: 0;
+}
+
+.battle-intro__icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.battle-intro__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.battle-intro__sub {
+  font-size: 1rem;
+  color: #555;
+  margin: 0 0 2rem;
+  line-height: 1.5;
+}
+
+.battle-intro__card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 2rem;
+}
+
+.battle-intro__category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #999;
+  margin: 0 0 0.75rem;
+}
+
+.battle-intro__score {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #171717;
+  margin: 0 0 0.25rem;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.battle-intro__score-label {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+.battle-intro__start-btn {
+  width: 100%;
+  max-width: 360px;
+  padding: 16px;
+  border: none;
+  border-radius: 24px;
+  background: #171717;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+
+  &:hover { background: #3a3a3a }
+  &:active { transform: scale(0.98) }
+}
+
+.battle-intro__error {
+  font-size: 1rem;
+  color: #df7954;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.battle-intro__home-btn {
+  margin-top: 1.25rem;
+  background: none;
+  border: none;
+  color: #171717;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+// ─── Battle results ───────────────────────────────────────────────────────────
+.battle-results {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1.25rem 3rem;
+  background: #fafafa;
+  gap: 0;
+}
+
+.battle-results__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #171717;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.battle-results__outcome {
+  font-size: 1rem;
+  color: #555;
+  margin: 0 0 2rem;
+  text-align: center;
+}
+
+.battle-results__outcome--win  { color: #2e7d32 }
+.battle-results__outcome--lose { color: #c62828 }
+.battle-results__outcome--tie  { color: #555 }
+
+.battle-results__scores {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 2rem;
+}
+
+.battle-results__score-card {
+  flex: 1;
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border: 2px solid transparent;
+
+  &--winner {
+    border-color: #171717;
+  }
+}
+
+.battle-results__score-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #999;
+  margin: 0 0 0.5rem;
+}
+
+.battle-results__score-value {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #171717;
+  letter-spacing: -0.04em;
+  margin: 0 0 0.2rem;
+  line-height: 1;
+}
+
+.battle-results__score-total {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin: 0;
+}
+
+.battle-results__winner-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: #171717;
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.battle-results__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 420px;
+}
+
+.battle-results__btn {
+  padding: 14px;
+  border-radius: 24px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+
+  &:active { transform: scale(0.98) }
+
+  &--primary {
+    background: #171717;
+    color: #fff;
+    &:hover { background: #3a3a3a }
+  }
+
+  &--secondary {
+    background: #f0f0f0;
+    color: #171717;
+    &:hover { background: #e4e4e4 }
+  }
+}
+
+// ─── Challenge button in ResultsDialog ────────────────────────────────────────
+.challenge-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 24px;
+  border: 2px solid #171717;
+  background: transparent;
+  color: #171717;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: 0.75rem;
+
+  &:hover:not(:disabled) { background: #f5f5f5 }
+  &:active:not(:disabled) { transform: scale(0.98) }
+  &:disabled { opacity: 0.5; cursor: not-allowed }
+
+  &--copied {
+    background: #171717;
+    color: #fff;
+    border-color: #171717;
+  }
+}

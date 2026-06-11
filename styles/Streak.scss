@@ -1,0 +1,95 @@
+// ─── Streak display in game header ────────────────────────────────────────────
+.streak-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ff6b2b;
+}
+
+// ─── Smartass Pass modal ──────────────────────────────────────────────────────
+.pass-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  padding: 1rem;
+}
+
+.pass-modal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2rem 1.75rem;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+
+  &__flame {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #171717;
+    margin-bottom: 0.5rem;
+  }
+
+  &__subtitle {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+
+  &__note {
+    font-size: 0.75rem;
+    color: #999;
+    margin-bottom: 1.25rem;
+  }
+
+  &__buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__btn {
+    padding: 12px 20px;
+    border-radius: 14px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed }
+
+    &--save {
+      background: #171717;
+      color: #fff;
+      &:hover:not(:disabled) { background: #3a3a3a }
+    }
+
+    &--dismiss {
+      background: transparent;
+      color: #999;
+      font-weight: 500;
+      &:hover:not(:disabled) { color: #555 }
+    }
+  }
+
+  &__saved {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}

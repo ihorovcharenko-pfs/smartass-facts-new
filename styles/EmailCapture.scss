@@ -1,0 +1,69 @@
+.email-capture {
+  background: #f8f8f8;
+  border: 1.5px solid #e8e8e8;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+
+  &--success {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+    background: rgba(80, 186, 133, 0.08);
+    border-color: rgba(80, 186, 133, 0.3);
+  }
+
+  &__check { font-size: 1.1rem }
+
+  &__label {
+    font-size: 0.875rem;
+    color: #555;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  &__form {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 160px;
+    padding: 9px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus { border-color: #171717 }
+  }
+
+  &__button {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #171717;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) { background: #3a3a3a }
+    &:disabled { opacity: 0.5; cursor: not-allowed }
+  }
+
+  &__error {
+    font-size: 0.8rem;
+    color: #df7954;
+    margin-top: 0.5rem;
+  }
+}

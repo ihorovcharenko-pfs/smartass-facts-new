@@ -1,0 +1,63 @@
+:root {
+  --color-bg: #0b0b16;
+  --color-surface: #13131f;
+  --color-surface-2: #1a1a2e;
+  --color-border: #2a2a3e;
+  --color-primary: #F06030;
+  --color-primary-hover: #d4522a;
+  --color-text: #e8e8f0;
+  --color-text-muted: #8888a8;
+  --color-fact: #66bb6a;
+  --color-fake: #ef5350;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+
+  &--transitioning {
+    overflow: hidden;
+  }
+}
+
+.header,
+.footer,
+.main-page {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.game {
+  animation: fadeIn 0.3s ease-in-out;
+  min-height: 100vh;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-10px); }
+}
+
+.app--transitioning .header,
+.app--transitioning .footer,
+.app--transitioning .main-page {
+  animation: fadeOut 0.3s ease-in-out;
+}
