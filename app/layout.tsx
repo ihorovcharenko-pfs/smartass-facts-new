@@ -5,19 +5,21 @@ import Providers from '../components/Providers'
 import Analytics from '../components/Analytics'
 import ServiceWorkerRegister from '../components/ServiceWorkerRegister'
 
-// Self-hosted (no external Google request) + display:swap so text paints
-// instantly in a fallback and swaps when the webfont arrives. Exposed as CSS
+// Self-hosted (no external Google request). display:'optional' so the LCP text
+// (hero <h1>) paints ONCE in the metric-matched fallback — no late webfont swap
+// that re-records LCP at ~6s on throttled mobile. The real font still downloads
+// in the background and is used from cache on subsequent visits. Exposed as CSS
 // variables consumed throughout the SCSS (var(--font-inter) / --font-space-grotesk).
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
-  display: 'swap',
+  display: 'optional',
 })
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-space-grotesk',
-  display: 'swap',
+  display: 'optional',
 })
 
 export const metadata: Metadata = {
