@@ -10,10 +10,13 @@ type Params = { params: Promise<{ category: string }> }
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { category } = await params
   const displayName = getDisplayName(category)
+  const data = await getFactsByCategoryServer(category, 1)
+  const thin = data === null || data.total < 5
   return {
     title: `${displayName} Facts | SmartAss Facts`,
     description: `Surprising ${displayName} facts — can you tell which are real and which are fake?`,
     alternates: { canonical: `https://smartassfacts.com/facts/${category}/` },
+    ...(thin && { robots: { index: false, follow: true } }),
   }
 }
 
