@@ -7,8 +7,11 @@ const nextConfig: NextConfig = {
   turbopack: { root: __dirname },
   outputFileTracingRoot: __dirname,
   images: {
+    // Serve AVIF first (smaller than WebP), fall back to WebP.
+    formats: ["image/avif", "image/webp"],
+    // Optimized images are content-stable — cache them at the edge for a year.
+    minimumCacheTTL: 31536000,
     // The Express API serves some category/group images from its own origin.
-    // Allowed here so we can adopt next/image later without further config.
     remotePatterns: [
       { protocol: "https", hostname: "api.smartassfacts.com" },
     ],

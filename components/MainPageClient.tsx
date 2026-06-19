@@ -6,6 +6,7 @@
 // SSR HTML — the whole point of the migration. Search/filter interactivity runs
 // client-side over the already-rendered list.
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import flagIcon from '../assets/flag.png'
 import { getImageUrl, getUserToken, type Group, type Category } from '../services/clientService'
 import { useApp } from '../context/AppContext'
@@ -203,9 +204,11 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                 const isGameOfTheDay = category.saCategory.toLowerCase() === 'game of the day' || category.category.toLowerCase() === 'game of the day'
                 const isFavourite = favouriteCategories.includes(category.id)
                 const imgSrc = getCategoryImage(category.saCategory, category.imageUrl)
-                // All category cards sit below the hero fold on mobile and none is
-                // the LCP element (that's the hero <h1>), so they all lazy-load —
-                // keeping the critical path clear for CSS/JS/fonts.
+                // The first card (Game of the day) is the LCP element on mobile.
+                // next/image `priority` preloads it with high fetchpriority so it
+                // loads early and consistently; the rest lazy-load. next/image also
+                // serves smaller responsive AVIF/WebP (fixes "improve image delivery").
+                const isLcpImage = index === 0
                 return (
                   <div
                     key={category.id}
@@ -221,15 +224,13 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                         </div>
                       )}
                       {imgSrc ? (
-                        <img
+                        <Image
                           src={imgSrc}
                           alt={category.saCategory}
+                          fill
+                          sizes="(max-width: 500px) 92vw, (max-width: 1100px) 46vw, 28vw"
                           className="category-card__image"
-                          width={400}
-                          height={300}
-                          loading="lazy"
-                          decoding="async"
-                          onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                          priority={isLcpImage}
                         />
                       ) : (
                         <div className="category-card__placeholder">
