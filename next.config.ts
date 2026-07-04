@@ -16,6 +16,17 @@ const nextConfig: NextConfig = {
       // Old /random/[category]/ routes don't exist in Next.js
       { source: '/random/:category/', destination: '/random/', permanent: true },
       { source: '/random/:category', destination: '/random/', permanent: true },
+      // Old homepage ?category= filter links (e.g. /?category=science → /facts/science/)
+      {
+        source: '/',
+        has: [{ type: 'query', key: 'category', value: '(?<category>.+)' }],
+        destination: '/facts/:category/',
+        permanent: true,
+      },
+      // Old VPS nested path: /facts/pets/animals/[slug] → /facts/pets-animals/[slug]/
+      { source: '/facts/pets/animals/:slug*', destination: '/facts/pets-animals/:slug*/', permanent: true },
+      // Old VPS space-encoded category: /facts/guinness world records/[slug]
+      { source: '/facts/guinness world records/:slug*', destination: '/facts/guinness-world-records/:slug*/', permanent: true },
     ]
   },
   images: {

@@ -2,6 +2,7 @@
 // pages). Fetches the fact AND decrypts its answer on the server, so the full
 // statement + verdict are in the initial HTML.
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import FactDetailPage from '@/components/FactDetailPage'
 import { getFactByIdServer } from '@/services/serverData'
 import { decryptAnswer } from '@/utils/decryption'
@@ -26,24 +27,25 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function Page({ params }: Params) {
   const { category, slug } = await params
   const id = parseId(slug)
+  if (isNaN(id)) notFound()
   // getFactByIdServer here hits the same cached/memoized fetch as generateMetadata.
-  const data = isNaN(id) ? null : await getFactByIdServer(id)
+  const data = await getFactByIdServer(id)
+
+  if (!data) notFound()
 
   let initialIsReal: boolean | null = null
-  if (data) {
-    try {
-      initialIsReal = await decryptAnswer(data.fact.answer)
-    } catch {
-      initialIsReal = null
-    }
+  try {
+    initialIsReal = await decryptAnswer(data.fact.answer)
+  } catch {
+    initialIsReal = null
   }
 
   return (
     <FactDetailPage
       categorySlug={category}
       factSlug={slug}
-      initialFact={data?.fact ?? null}
-      initialRelated={data?.related ?? []}
+      initialFact={data.fact}
+      initialRelated={data.related}
       initialIsReal={initialIsReal}
     />
   )
