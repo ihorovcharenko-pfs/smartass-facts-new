@@ -152,7 +152,7 @@ export default function FactsPage() {
 
       {/* ── For Educators ────────────────────────────────────────── */}
       <div className="facts-educators-wrap">
-        <a className="facts-educators" href="/for-educators/">
+        <a className="facts-educators" href="/educators/">
           <div className="facts-educators__text">
             <div className="facts-educators__icon">🏫</div>
             <h3>Free Classroom Resources</h3>

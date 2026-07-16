@@ -126,6 +126,9 @@
   @media (max-width: 640px) { grid-template-columns: 1fr; }
 }
 .myth-card {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -263,4 +266,12 @@
   }
 
   @media (max-width: 768px) { padding: 40px 28px; }
+}
+
+.myth-card__more {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
 }
