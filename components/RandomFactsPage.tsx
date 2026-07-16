@@ -1,47 +1,51 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useApp } from '../context/AppContext'
 import { fetchFactsForClient, type Fact } from '../services/clientService'
+import { CATEGORY_DISPLAY } from '../utils/categoryNames'
 import '../styles/RandomFactsPage.scss'
 
+// slug = key into CATEGORY_DISPLAY → the saCategory value the API filters on
 const CATEGORIES = [
-  { emoji: '🎨', name: 'Arts', count: 110 },
-  { emoji: '🚗', name: 'Cars', count: 129 },
-  { emoji: '🏗️', name: 'Construction', count: 117 },
-  { emoji: '🌍', name: 'Countries', count: 45 },
-  { emoji: '✏️', name: 'Design', count: 111 },
-  { emoji: '⭐', name: 'Famous People', count: 173 },
-  { emoji: '👗', name: 'Fashion', count: 153 },
-  { emoji: '💰', name: 'Finance', count: 138 },
-  { emoji: '🍕', name: 'Food', count: 204 },
-  { emoji: '🎮', name: 'Games', count: 154 },
-  { emoji: '🗺️', name: 'Geography', count: 189 },
-  { emoji: '🏆', name: 'World Records', count: 198 },
-  { emoji: '💪', name: 'Health', count: 146 },
-  { emoji: '📜', name: 'History', count: 193 },
-  { emoji: '🧠', name: 'Human Brain', count: 87 },
-  { emoji: '🧬', name: 'Humans', count: 60 },
-  { emoji: '😂', name: 'Humour', count: 131 },
-  { emoji: '💡', name: 'Inventions', count: 172 },
-  { emoji: '🗣️', name: 'Languages', count: 161 },
-  { emoji: '📚', name: 'Literature', count: 146 },
-  { emoji: '🔢', name: 'Mathematics', count: 155 },
-  { emoji: '🎬', name: 'Movies', count: 163 },
-  { emoji: '🎵', name: 'Music', count: 186 },
-  { emoji: '🌿', name: 'Nature', count: 200 },
-  { emoji: '🐶', name: 'Pets & Animals', count: 217 },
-  { emoji: '🤔', name: 'Philosophy', count: 199 },
-  { emoji: '⚛️', name: 'Physics', count: 208 },
-  { emoji: '🏛️', name: 'Politics', count: 179 },
-  { emoji: '🧩', name: 'Psychology', count: 198 },
-  { emoji: '🙏', name: 'Religion', count: 199 },
-  { emoji: '🔬', name: 'Science', count: 170 },
-  { emoji: '🚀', name: 'Space', count: 205 },
-  { emoji: '⚽', name: 'Sports', count: 210 },
-  { emoji: '💻', name: 'Technology', count: 187 },
-  { emoji: '✈️', name: 'Travel', count: 194 },
+  { emoji: '🎨', name: 'Arts', slug: 'arts', count: 110 },
+  { emoji: '🚗', name: 'Cars', slug: 'cars', count: 129 },
+  { emoji: '🏗️', name: 'Construction', slug: 'construction', count: 117 },
+  { emoji: '🌍', name: 'Countries', slug: 'countries', count: 45 },
+  { emoji: '✏️', name: 'Design', slug: 'design', count: 111 },
+  { emoji: '⭐', name: 'Famous People', slug: 'famous-people', count: 173 },
+  { emoji: '👗', name: 'Fashion', slug: 'fashion', count: 153 },
+  { emoji: '💰', name: 'Finance', slug: 'finance', count: 138 },
+  { emoji: '🍕', name: 'Food', slug: 'food', count: 204 },
+  { emoji: '🎮', name: 'Games', slug: 'games', count: 154 },
+  { emoji: '🗺️', name: 'Geography', slug: 'geography', count: 189 },
+  { emoji: '🏆', name: 'World Records', slug: 'guinness-world-records', count: 198 },
+  { emoji: '💪', name: 'Health', slug: 'health', count: 146 },
+  { emoji: '📜', name: 'History', slug: 'history', count: 193 },
+  { emoji: '🧠', name: 'Human Brain', slug: 'human-brain', count: 87 },
+  { emoji: '🧬', name: 'Humans', slug: 'humans', count: 60 },
+  { emoji: '😂', name: 'Humour', slug: 'humour', count: 131 },
+  { emoji: '💡', name: 'Inventions', slug: 'inventions', count: 172 },
+  { emoji: '🗣️', name: 'Languages', slug: 'languages', count: 161 },
+  { emoji: '📚', name: 'Literature', slug: 'literature', count: 146 },
+  { emoji: '🔢', name: 'Mathematics', slug: 'mathematics', count: 155 },
+  { emoji: '🎬', name: 'Movies', slug: 'movies', count: 163 },
+  { emoji: '🎵', name: 'Music', slug: 'music', count: 186 },
+  { emoji: '🌿', name: 'Nature', slug: 'nature', count: 200 },
+  { emoji: '🐶', name: 'Pets & Animals', slug: 'pets-animals', count: 217 },
+  { emoji: '🤔', name: 'Philosophy', slug: 'philosophy', count: 199 },
+  { emoji: '⚛️', name: 'Physics', slug: 'physics', count: 208 },
+  { emoji: '🏛️', name: 'Politics', slug: 'politics', count: 179 },
+  { emoji: '🧩', name: 'Psychology', slug: 'psychology', count: 198 },
+  { emoji: '🙏', name: 'Religion', slug: 'religion', count: 199 },
+  { emoji: '🔬', name: 'Science', slug: 'science', count: 170 },
+  { emoji: '🚀', name: 'Space', slug: 'space', count: 205 },
+  { emoji: '⚽', name: 'Sports', slug: 'sports', count: 210 },
+  { emoji: '💻', name: 'Technology', slug: 'technology', count: 187 },
+  { emoji: '✈️', name: 'Travel', slug: 'travel', count: 194 },
 ]
+
+type Category = (typeof CATEGORIES)[number]
 
 const FAQ_ITEMS = [
   {
@@ -90,29 +94,54 @@ export default function RandomFactsPage() {
   const [loading, setLoading] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [hasStarted, setHasStarted] = useState(false)
+  const [selectedCat, setSelectedCat] = useState<Category | null>(null)
+  const generatorRef = useRef<HTMLDivElement>(null)
 
-  const getRandomFact = useCallback(async () => {
+  // Pool and used-ids are passed explicitly so a category switch can draw from
+  // a fresh pool immediately instead of waiting for state to settle.
+  const drawFact = useCallback(async (cat: Category | null, currentPool: Fact[], currentUsed: number[]) => {
     setLoading(true)
     setHasStarted(true)
     try {
-      let available = pool.filter(f => !usedIds.includes(f.id))
+      let available = currentPool.filter(f => !currentUsed.includes(f.id))
       if (available.length < 3) {
-        const fresh = await fetchFactsForClient(undefined, usedIds.slice(-100))
-        const newFacts = fresh.filter(f => !usedIds.includes(f.id))
-        setPool(prev => [...prev, ...newFacts])
+        const saCategory = cat ? CATEGORY_DISPLAY[cat.slug] : undefined
+        const fresh = await fetchFactsForClient(saCategory, currentUsed.length > 0 ? currentUsed.slice(-100) : undefined)
+        const newFacts = fresh.filter(f => !currentUsed.includes(f.id))
+        setPool([...currentPool, ...newFacts])
         available = [...available, ...newFacts]
       }
       if (available.length > 0) {
         const pick = available[Math.floor(Math.random() * available.length)]
         setFact(pick)
-        setUsedIds(prev => [...prev, pick.id])
+        setUsedIds([...currentUsed, pick.id])
       }
     } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
     }
-  }, [pool, usedIds])
+  }, [])
+
+  const getRandomFact = () => drawFact(selectedCat, pool, usedIds)
+
+  // Category pill click: toggle the filter, reset the pool, draw immediately,
+  // and bring the generator back into view so the result is visible.
+  const handleCategoryClick = (cat: Category) => {
+    const next = selectedCat?.slug === cat.slug ? null : cat
+    setSelectedCat(next)
+    setPool([])
+    setUsedIds([])
+    generatorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    drawFact(next, [], [])
+  }
+
+  const clearCategory = () => {
+    setSelectedCat(null)
+    setPool([])
+    setUsedIds([])
+    drawFact(null, [], [])
+  }
 
   const isTrue = fact?.answer?.toUpperCase() === 'FACT'
 
@@ -142,8 +171,14 @@ export default function RandomFactsPage() {
       </div>
 
       {/* ── Generator ─────────────────────────────────────────────── */}
-      <div className="random-generator-wrap">
+      <div className="random-generator-wrap" ref={generatorRef}>
         <div className="random-generator">
+          {selectedCat && (
+            <div className="random-filter-chip">
+              <span>{selectedCat.emoji} Showing {selectedCat.name} facts</span>
+              <button type="button" onClick={clearCategory} aria-label="Clear category filter">✕</button>
+            </div>
+          )}
           {/* Fact display */}
           <div className={`random-fact-card ${!hasStarted ? 'random-fact-card--empty' : ''} ${loading ? 'random-fact-card--loading' : ''}`}>
             {!hasStarted && !loading && (
@@ -194,35 +229,20 @@ export default function RandomFactsPage() {
       <div className="random-categories-wrap">
         <div className="random-categories-inner">
           <h2 className="random-section-heading">Browse by Category</h2>
+          <p className="random-section-sub">Pick a category to get random facts from just that topic. Click it again to go back to all categories.</p>
           <div className="random-cat-pills">
-            {CATEGORIES.map((c, i) => (
+            {CATEGORIES.map(c => (
               <button
-                key={i}
-                className="random-cat-pill"
-                onClick={() => navigate('/')}
+                key={c.slug}
+                className={`random-cat-pill ${selectedCat?.slug === c.slug ? 'random-cat-pill--active' : ''}`}
+                onClick={() => handleCategoryClick(c)}
                 title={`${c.count} facts`}
+                aria-pressed={selectedCat?.slug === c.slug}
               >
                 <span>{c.emoji}</span>
                 <span>{c.name}</span>
               </button>
             ))}
-          </div>
-          <div className="random-cat-full">
-            <h3 className="random-section-heading" style={{ fontSize: '1.1rem', marginTop: '48px', marginBottom: '20px' }}>
-              All Fact Categories
-            </h3>
-            <div className="random-cat-list">
-              {CATEGORIES.map((c, i) => (
-                <button
-                  key={i}
-                  className="random-cat-row"
-                  onClick={() => navigate('/')}
-                >
-                  <span>{c.emoji} {c.name}</span>
-                  <span className="random-cat-row__count">({c.count} facts)</span>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
       </div>
