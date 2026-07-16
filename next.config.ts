@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
       { source: '/facts/pets/animals/:slug*', destination: '/facts/pets-animals/:slug*/', permanent: true },
       // Old VPS space-encoded category: /facts/guinness world records/[slug]
       { source: '/facts/guinness world records/:slug*', destination: '/facts/guinness-world-records/:slug*/', permanent: true },
+      // Old VPS educators page lives at /educators/ in the Next.js app
+      { source: '/for-educators/', destination: '/educators/', permanent: true },
+      { source: '/for-educators', destination: '/educators/', permanent: true },
     ]
   },
   images: {

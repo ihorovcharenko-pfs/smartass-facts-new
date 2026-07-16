@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fake or Fact? — SmartAss Facts Daily Quiz</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f1a;
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+    }
+
+    /* Header */
+    .quiz-header {
+      width: 100%;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      border-bottom: 1px solid rgba(171,71,188,0.3);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .quiz-brand {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ab47bc;
+      text-decoration: none;
+    }
+    .quiz-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+    .progress-label {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.07);
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7b1fa2, #e94560);
+      transition: width 0.4s ease;
+    }
+
+    /* Main area */
+    .quiz-body {
+      width: 100%;
+      max-width: 560px;
+      padding: 24px 20px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Question */
+    .question-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #f0f0f0;
+      margin-bottom: 24px;
+      min-height: 56px;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .btn-choice {
+      padding: 16px;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-fake {
+      background: rgba(233,69,96,0.1);
+      border-color: rgba(233,69,96,0.35);
+      color: #e94560;
+    }
+    .btn-fake:hover:not(:disabled) {
+      background: rgba(233,69,96,0.2);
+      border-color: #e94560;
+      transform: translateY(-1px);
+    }
+    .btn-fact {
+      background: rgba(76,175,80,0.1);
+      border-color: rgba(76,175,80,0.35);
+      color: #66bb6a;
+    }
+    .btn-fact:hover:not(:disabled) {
+      background: rgba(76,175,80,0.2);
+      border-color: #66bb6a;
+      transform: translateY(-1px);
+    }
+    .btn-choice:disabled { cursor: default; transform: none; }
+
+    /* Answer feedback */
+    .feedback {
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .feedback.correct {
+      background: rgba(76,175,80,0.1);
+      border: 1px solid rgba(76,175,80,0.3);
+      color: #a5d6a7;
+      display: block;
+    }
+    .feedback.wrong {
+      background: rgba(233,69,96,0.1);
+      border: 1px solid rgba(233,69,96,0.3);
+      color: #ef9a9a;
+      display: block;
+    }
+    .feedback strong { color: #fff; display: block; margin-bottom: 4px; font-size: 0.95rem; }
+    .feedback a { color: inherit; text-decoration: underline; }
+
+    /* Next button */
+    .btn-next {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #7b1fa2, #ab47bc);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: opacity 0.15s;
+    }
+    .btn-next:hover { opacity: 0.9; }
+    .btn-next.visible { display: block; }
+
+    /* Score screen */
+    .score-screen {
+      display: none;
+      text-align: center;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+    }
+    .score-screen.visible { display: flex; }
+    .score-emoji { font-size: 3rem; margin-bottom: 12px; }
+    .score-num { font-size: 3.5rem; font-weight: 900; color: #ab47bc; margin-bottom: 4px; }
+    .score-sub { font-size: 1rem; color: #888; margin-bottom: 24px; }
+    .score-label { font-size: 1.1rem; font-weight: 700; color: #f0f0f0; margin-bottom: 6px; }
+    .score-rank { font-size: 0.85rem; color: #aaa; line-height: 1.6; margin-bottom: 24px; max-width: 320px; }
+
+    .share-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+    .btn-share {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+    }
+    .btn-share:hover { opacity: 0.85; }
+    .btn-twitter {
+      background: #1DA1F2;
+      color: #fff;
+    }
+    .btn-copy {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ddd;
+    }
+    .btn-retry {
+      background: rgba(171,71,188,0.15);
+      border: 1px solid rgba(171,71,188,0.35);
+      color: #ce93d8;
+    }
+    .copy-confirm {
+      font-size: 0.78rem;
+      color: #66bb6a;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+
+    /* Footer attribution */
+    .quiz-footer {
+      width: 100%;
+      padding: 10px 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+    }
+    .quiz-footer a {
+      font-size: 0.72rem;
+      color: #555;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+    .quiz-footer a:hover { color: #ab47bc; }
+    .quiz-footer a span { color: #ab47bc; }
+
+    /* State modifiers on choice buttons */
+    .btn-choice.selected-correct {
+      background: rgba(76,175,80,0.2);
+      border-color: #66bb6a;
+      color: #a5d6a7;
+    }
+    .btn-choice.selected-wrong {
+      background: rgba(233,69,96,0.2);
+      border-color: #e94560;
+      color: #ef9a9a;
+    }
+    .btn-choice.reveal-correct {
+      background: rgba(76,175,80,0.12);
+      border-color: rgba(76,175,80,0.5);
+      color: #a5d6a7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-header">
+  <a class="quiz-brand" href="https://smartassfacts.com/" target="_blank">SmartAss Facts</a>
+  <span class="quiz-title">Fake or Fact?</span>
+  <span class="progress-label" id="progress-label">1 / 10</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:10%"></div></div>
+
+<div class="quiz-body" id="quiz-body">
+  <div class="question-num" id="q-num">Question 1 of 10</div>
+  <div class="question-text" id="q-text">Loading…</div>
+  <div class="btn-row">
+    <button class="btn-choice btn-fake" id="btn-fake" onclick="answer('fake')">🚫 FAKE</button>
+    <button class="btn-choice btn-fact" id="btn-fact" onclick="answer('fact')">✅ FACT</button>
+  </div>
+  <div class="feedback" id="feedback"></div>
+  <button class="btn-next" id="btn-next" onclick="nextQuestion()">Next →</button>
+</div>
+
+<div class="score-screen" id="score-screen">
+  <div class="score-emoji" id="score-emoji">🧠</div>
+  <div class="score-num" id="score-num">0/10</div>
+  <div class="score-sub">correct answers</div>
+  <div class="score-label" id="score-label">Nice try!</div>
+  <div class="score-rank" id="score-rank"></div>
+  <div class="share-row">
+    <button class="btn-share btn-twitter" onclick="shareTwitter()">🐦 Share on X</button>
+    <button class="btn-share btn-copy" onclick="copyScore()">📋 Copy result</button>
+    <button class="btn-share btn-retry" onclick="retryQuiz()">🔄 Try again</button>
+  </div>
+  <div class="copy-confirm" id="copy-confirm"></div>
+</div>
+
+<div class="quiz-footer">
+  <a href="https://smartassfacts.com/" target="_blank">Powered by <span>SmartAss Facts</span> — myths debunked with primary sources</a>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "Humans only use 10% of their brain at any given time.",
+    answer: "fake",
+    explanation: "Brain imaging (fMRI/PET) shows virtually all regions are active during normal daily life. No area is permanently idle.",
+    link: "https://smartassfacts.com/facts/myths/you-only-use-10-percent-of-your-brain/",
+    label: "10% Brain Myth"
+  },
+  {
+    text: "Goldfish have a memory span of only three seconds.",
+    answer: "fake",
+    explanation: "Goldfish can retain memories for months. Research at Plymouth University showed they remembered trained behaviours after months without practice.",
+    link: "https://smartassfacts.com/facts/myths/goldfish-have-three-second-memories/",
+    label: "Goldfish Memory Myth"
+  },
+  {
+    text: "Blood inside your veins is blue — it only turns red when it hits oxygen.",
+    answer: "fake",
+    explanation: "Blood is always red. Deoxygenated blood is dark red, not blue. Veins look bluish through skin because of how different light wavelengths penetrate tissue.",
+    link: "https://smartassfacts.com/facts/myths/blood-in-veins-is-blue/",
+    label: "Blue Blood Myth"
+  },
+  {
+    text: "Cracking your knuckles will eventually cause arthritis.",
+    answer: "fake",
+    explanation: "The crack is gas bubbles collapsing in synovial fluid. A physician cracked one hand's knuckles for 60 years — no arthritis difference versus the other hand.",
+    link: "https://smartassfacts.com/facts/myths/cracking-knuckles-causes-arthritis/",
+    label: "Knuckle Cracking Myth"
+  },
+  {
+    text: "Bulls are actually colorblind to red — they react to the cape's movement, not its color.",
+    answer: "fact",
+    explanation: "Cattle are red-green colorblind. The matador's red cape (muleta) works because of its rapid motion, not its color. A blue cape moved the same way has the same effect.",
+    link: "https://smartassfacts.com/facts/myths/bulls-are-enraged-by-the-color-red/",
+    label: "Bull & Red Myth"
+  },
+  {
+    text: "Bats are completely blind and navigate entirely by sound.",
+    answer: "fake",
+    explanation: "Bats have functional eyes and many species see well. They use echolocation to navigate in darkness, but they are not blind — the phrase 'blind as a bat' is a myth.",
+    link: "https://smartassfacts.com/facts/myths/bats-are-blind/",
+    label: "Blind Bats Myth"
+  },
+  {
+    text: "The Empire State Building is struck by lightning roughly 20–25 times per year.",
+    answer: "fact",
+    explanation: "Lightning preferentially strikes tall, conductive objects. The 'never strikes twice' myth applies to random locations — tall structures are struck repeatedly because they create the path of least electrical resistance.",
+    link: "https://smartassfacts.com/facts/myths/lightning-never-strikes-the-same-place-twice/",
+    label: "Lightning Myth"
+  },
+  {
+    text: "The Great Wall of China is clearly visible from space with the naked eye.",
+    answer: "fake",
+    explanation: "At most 9 metres wide, the Wall is far too narrow to resolve from orbital altitude (~400 km). Chinese astronaut Yang Liwei confirmed he could not see it.",
+    link: "https://smartassfacts.com/facts/myths/you-can-see-the-great-wall-of-china-from-space/",
+    label: "Great Wall Myth"
+  },
+  {
+    text: "Double-blind studies have found no link between dietary sugar and hyperactivity in children.",
+    answer: "fact",
+    explanation: "A landmark 1995 JAMA meta-analysis of 23 controlled trials found zero evidence that sugar affects children's behaviour. The belief is an expectation effect in parents.",
+    link: "https://smartassfacts.com/facts/myths/sugar-makes-kids-hyperactive/",
+    label: "Sugar Hyperactivity Myth"
+  },
+  {
+    text: "Eating carrots improves your eyesight beyond your normal, healthy baseline.",
+    answer: "fake",
+    explanation: "Carrots contain beta-carotene (vitamin A precursor), which prevents night-blindness caused by vitamin A deficiency. But if you're not deficient, extra carrots won't sharpen your vision.",
+    link: "https://smartassfacts.com/facts/myths/carrots-improve-eyesight/",
+    label: "Carrots & Eyesight Myth"
+  }
+];
+
+let current = 0;
+let score   = 0;
+let answered = false;
+
+function render() {
+  const q = QUESTIONS[current];
+  document.getElementById('q-num').textContent   = `Question ${current + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-text').textContent  = q.text;
+  document.getElementById('progress-label').textContent = `${current + 1} / ${QUESTIONS.length}`;
+  document.getElementById('progress-fill').style.width  = `${((current + 1) / QUESTIONS.length) * 100}%`;
+
+  // Reset buttons
+  const btnFake = document.getElementById('btn-fake');
+  const btnFact = document.getElementById('btn-fact');
+  btnFake.disabled = false;
+  btnFact.disabled = false;
+  btnFake.className = 'btn-choice btn-fake';
+  btnFact.className = 'btn-choice btn-fact';
+
+  document.getElementById('feedback').className   = 'feedback';
+  document.getElementById('feedback').innerHTML   = '';
+  document.getElementById('btn-next').className   = 'btn-next';
+  answered = false;
+}
+
+function answer(choice) {
+  if (answered) return;
+  answered = true;
+  const q   = QUESTIONS[current];
+  const correct = (choice === q.answer);
+  if (correct) score++;
+
+  const btnFake = document.getElementById('btn-fake');
+  const btnFact = document.getElementById('btn-fact');
+  btnFake.disabled = true;
+  btnFact.disabled = true;
+
+  // Highlight chosen
+  if (choice === 'fake') {
+    btnFake.className = 'btn-choice btn-fake ' + (correct ? 'selected-correct' : 'selected-wrong');
+  } else {
+    btnFact.className = 'btn-choice btn-fact ' + (correct ? 'selected-correct' : 'selected-wrong');
+  }
+
+  // Reveal correct if wrong
+  if (!correct) {
+    if (q.answer === 'fake') btnFake.className += ' reveal-correct';
+    else                      btnFact.className += ' reveal-correct';
+  }
+
+  // Feedback
+  const fb = document.getElementById('feedback');
+  fb.className  = 'feedback ' + (correct ? 'correct' : 'wrong');
+  fb.innerHTML  = `<strong>${correct ? '✅ Correct!' : '❌ That\'s a myth!'}</strong>${q.explanation} <a href="${q.link}" target="_blank">Learn more →</a>`;
+
+  // Next / Finish
+  const btnNext = document.getElementById('btn-next');
+  btnNext.textContent = (current < QUESTIONS.length - 1) ? 'Next →' : 'See my score →';
+  btnNext.className   = 'btn-next visible';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= QUESTIONS.length) {
+    showScore();
+  } else {
+    render();
+  }
+}
+
+function showScore() {
+  document.getElementById('quiz-body').style.display   = 'none';
+  const ss = document.getElementById('score-screen');
+  ss.className = 'score-screen visible';
+
+  document.getElementById('score-num').textContent = `${score}/10`;
+
+  const rank = getRank(score);
+  document.getElementById('score-emoji').textContent = rank.emoji;
+  document.getElementById('score-label').textContent = rank.label;
+  document.getElementById('score-rank').textContent  = rank.desc;
+}
+
+function getRank(s) {
+  if (s === 10) return { emoji: '🏆', label: 'Perfect Score!', desc: 'You\'re a certified myth-buster. Every single one. Impressive — most people fall for at least 2 of these.' };
+  if (s >= 8)  return { emoji: '🧠', label: 'Myth Buster!',    desc: 'Sharp. You see through most myths — only the clever ones caught you.' };
+  if (s >= 6)  return { emoji: '🔍', label: 'Pretty Smart',    desc: 'Above average. A few myths slipped through — but you\'ve got solid instincts.' };
+  if (s >= 4)  return { emoji: '🤔', label: 'Getting There',   desc: 'You know your stuff on some topics, but common myths still catch you out. Time to dig deeper.' };
+  return        { emoji: '😬', label: 'Fooled by Myths',  desc: 'Don\'t worry — these are some of the most persistent myths in science. Now you know the truth.' };
+}
+
+function shareTwitter() {
+  const text = `I scored ${score}/10 on the SmartAss Facts "Fake or Fact" quiz — can you beat me? 🧠\n\nhttps://smartassfacts.com/embed/quiz/`;
+  const url  = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+function copyScore() {
+  const text = `I scored ${score}/10 on the SmartAss Facts "Fake or Fact" quiz! Can you beat me? https://smartassfacts.com/embed/quiz/`;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = document.getElementById('copy-confirm');
+    el.textContent = '✅ Copied to clipboard!';
+    setTimeout(() => el.textContent = '', 3000);
+  });
+}
+
+function retryQuiz() {
+  current  = 0;
+  score    = 0;
+  answered = false;
+  document.getElementById('score-screen').className = 'score-screen';
+  document.getElementById('quiz-body').style.display = '';
+  render();
+}
+
+// Init
+render();
+</script>
+
+</body>
+</html>

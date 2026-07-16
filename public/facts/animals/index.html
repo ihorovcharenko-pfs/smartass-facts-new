@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animal Facts — Surprising Facts About Every Animal | SmartAss Facts</title>
+  <meta name="description" content="Hundreds of surprising animal facts across cats, dogs, birds, fish, and more. Discover what's true and what's fake.">
+  <link rel="canonical" href="https://smartassfacts.com/facts/animals/">
+  <meta property="og:type"    content="website">
+  <meta property="og:url"     content="https://smartassfacts.com/facts/animals/">
+  <meta property="og:title"   content="Animal Facts — SmartAss Facts">
+  <meta property="og:description" content="Hundreds of surprising animal facts across cats, dogs, birds, fish, and more. Discover what's true and what's fake.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CollectionPage","name":"Animal Facts — SmartAss Facts","description":"Hundreds of surprising animal facts across cats, dogs, birds, fish, and more. Discover what's true and what's fake.","url":"https://smartassfacts.com/facts/animals/","isPartOf":{"@type":"WebSite","url":"https://smartassfacts.com"}},{"@type":"Quiz","name":"Animal Myths Quiz — True or False?","educationalUse":"assessment","about":{"@type":"Thing","name":"Animal Facts"},"hasPart":[{"@type":"Question","name":"True or False: Goldfish have a three-second memory.","acceptedAnswer":{"@type":"Answer","text":"False. Goldfish can retain memories for months. Research at Plymouth University trained goldfish to press a lever at a specific time of day — and they kept doing so accurately after months without training.","url":"https://smartassfacts.com/facts/myths/goldfish-have-three-second-memories/"}},{"@type":"Question","name":"True or False: Bulls are enraged by the colour red.","acceptedAnswer":{"@type":"Answer","text":"False. Cattle are dichromats and cannot distinguish red from green. They react to the movement of the matador's cape, not its colour. Any colour cape moved the same way produces the same response.","url":"https://smartassfacts.com/facts/myths/bulls-are-enraged-by-the-color-red/"}},{"@type":"Question","name":"True or False: Bats are blind.","acceptedAnswer":{"@type":"Answer","text":"False. All bat species have functioning eyes and can see. Many also use echolocation, but this supplements rather than replaces vision. Some fruit bats have excellent night vision.","url":"https://smartassfacts.com/facts/myths/bats-are-blind/"}},{"@type":"Question","name":"True or False: Dogs see the world in black and white.","acceptedAnswer":{"@type":"Answer","text":"False. Dogs are dichromats — they see in two colour channels (blue and yellow) rather than the three humans use. They cannot distinguish red from green, but their world is not black and white.","url":"https://smartassfacts.com/facts/myths/dogs-are-completely-colorblind/"}}]}]}</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+           background: #0f0f1a; color: #f0f0f0; line-height: 1.6; min-height: 100vh; }
+    .container { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+    .breadcrumb { font-size: 13px; color: #888; margin-bottom: 24px; }
+    .breadcrumb a { color: #ff8f00; text-decoration: none; }
+    h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 12px; }
+    .lead { color: #ccc; margin-bottom: 32px; font-size: 1.05rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 48px; }
+    .animal-card { display: flex; flex-direction: column; align-items: center; gap: 6px;
+                   padding: 20px 12px; text-decoration: none; color: #f0f0f0;
+                   background: rgba(255,255,255,0.03); border: 1px solid;
+                   border-radius: 12px; transition: background 0.15s; text-align: center; }
+    .animal-card:hover { background: rgba(255,255,255,0.07); }
+    .animal-emoji  { font-size: 2rem; }
+    .animal-label  { font-size: 1rem; font-weight: 700; }
+    .animal-count  { font-size: 0.8rem; }
+    footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #1a1a2e;
+             font-size: 13px; color: #555; text-align: center; }
+    footer a { color: #ff8f00; text-decoration: none; }
+  
+    .footer-links { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-bottom: 10px; }
+    .footer-links a { color: #ab47bc; text-decoration: none; font-size: 13px; }
+    .footer-links a:hover { text-decoration: underline; }
+    .footer-copy { font-size: 12px; color: #444; }
+  
+  /* ── SmartAss Facts site header ── */
+  .saf-site-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 60px;
+    background: #13131f; border-bottom: 1px solid #2a2a3e;
+    position: sticky; top: 0; z-index: 100;
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+  .saf-site-header__brand {
+    display: flex; align-items: center; gap: 8px; text-decoration: none;
+  }
+  .saf-site-header__brand img { display: block; height: 34px; width: auto; }
+  .saf-site-header__name {
+    font-size: 1.0625rem; font-weight: 700; color: #e8e8f0; white-space: nowrap;
+  }
+  .saf-site-header__nav {
+    display: flex; align-items: center; gap: 20px;
+  }
+  .saf-site-header__link {
+    font-size: 0.875rem; color: #8888a8; text-decoration: none; transition: color 0.15s;
+  }
+  .saf-site-header__link:hover { color: #e8e8f0; }
+  .saf-site-header__play {
+    display: inline-flex; align-items: center;
+    background: #F06030; color: #fff; border-radius: 8px;
+    padding: 7px 16px; font-size: 0.875rem; font-weight: 600;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .saf-site-header__play:hover { background: #d4522a; }
+  @media (max-width: 500px) {
+    .saf-site-header { padding: 0 16px; }
+    .saf-site-header__name { display: none; }
+    .saf-site-header__link { display: none; }
+  }
+
+    /* ── SAF site-wide nav ── */
+    .saf-topnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #13131f;
+      border-bottom: 1px solid #252538;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .saf-brand {
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #f0f0f0;
+      text-decoration: none;
+    }
+    .saf-brand span { color: #F06030; }
+    .saf-nav-links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .saf-nav-links a {
+      color: #aaa;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .saf-nav-links a:hover { color: #f0f0f0; }
+    .saf-play-btn {
+      background: #F06030 !important;
+      color: #fff !important;
+      padding: 6px 16px !important;
+      border-radius: 20px !important;
+      font-weight: 700 !important;
+      font-size: 0.88rem !important;
+      white-space: nowrap;
+    }
+    .saf-play-btn:hover { opacity: 0.88; }
+    @media (max-width: 500px) {
+      .saf-nav-links { gap: 12px; }
+    }
+
+    /* ── SAF footer ── */
+    .saf-footer {
+      margin-top: 48px;
+      padding: 24px 16px 32px;
+      border-top: 1px solid #1e1e30;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .saf-footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px 20px;
+      margin-bottom: 12px;
+    }
+    .saf-footer-links a {
+      color: #666;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .saf-footer-links a:hover { color: #F06030; }
+    .saf-footer-copy {
+      font-size: 12px;
+      color: #444;
+    }
+</style>
+</head>
+<body>
+  <nav class="saf-topnav">
+    <a href="/" class="saf-brand">SmartAss<span>Facts</span></a>
+    <div class="saf-nav-links">
+      <a href="/facts/">Facts</a>
+      <a href="/facts/myths/">Myths</a>
+      <a href="/facts/vs/">vs</a>
+      <a href="/random/">Random</a>
+      <a href="/" class="saf-play-btn">▸ Play</a>
+    </div>
+  </nav>
+
+<header class="saf-site-header">
+  <a href="/" class="saf-site-header__brand">
+    <img src="/smartass-logo.png" alt="SmartAss Facts" height="34" width="auto" loading="eager">
+    <span class="saf-site-header__name">SmartAss Facts</span>
+  </a>
+  <nav class="saf-site-header__nav" aria-label="Main navigation">
+    <a href="/facts/" class="saf-site-header__link">Facts</a>
+    <a href="/facts/myths/" class="saf-site-header__link">Myths</a>
+    <a href="/random/" class="saf-site-header__link">Random</a>
+    <a href="/" class="saf-site-header__play">&#9654; Play Now</a>
+  </nav>
+</header>
+
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">Home</a> › <span>Animals</span>
+    </nav>
+    <div style="font-size:3rem;margin-bottom:8px">🐾</div>
+    <h1>Animal Facts</h1>
+    <p class="lead">Hundreds of surprising animal facts across cats, dogs, birds, fish, and more. Discover what's true and what's fake.</p>
+    <p class="page-intro-2">SmartAss Facts covers animal facts across every major vertebrate and invertebrate group, from apex predators to the insects that underpin most terrestrial ecosystems. Each animal category page collects the most surprising, verifiable claims about that species — trivia that tends to stick because it contradicts something we thought we knew. The facts in this collection are drawn from peer-reviewed zoology journals, field research, and the published work of academic naturalists. Everything is labeled ✓ TRUE or ✗ FAKE so you always know what's real.</p>
+    <p class="page-intro-3">The SmartAss Facts animal collection spans invertebrates, fish, amphibians, reptiles, birds, and mammals — covering both the familiar species that appear in popular culture and the less-known species whose biology is, if anything, more remarkable. Use the category links below to explore by animal group, or browse the fact cards for the most popular species.</p>
+    <p class="page-intro-4">Every animal fact in this collection links to its source — a peer-reviewed zoology study, a field research paper, or an official natural history publication — so you can verify any claim in seconds.</p>
+    <div class="grid">
+    <a href="https://smartassfacts.com/facts/animals/cat/" class="animal-card" style="border-color:#ab47bc20">
+      <span class="animal-emoji">🐱</span>
+      <span class="animal-label">Cat</span>
+      <span class="animal-count" style="color:#ab47bc">53 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/dog/" class="animal-card" style="border-color:#42a5f520">
+      <span class="animal-emoji">🐶</span>
+      <span class="animal-label">Dog</span>
+      <span class="animal-count" style="color:#42a5f5">46 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/bird/" class="animal-card" style="border-color:#26c6da20">
+      <span class="animal-emoji">🐦</span>
+      <span class="animal-label">Bird</span>
+      <span class="animal-count" style="color:#26c6da">22 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/fish/" class="animal-card" style="border-color:#1abc9c20">
+      <span class="animal-emoji">🐟</span>
+      <span class="animal-label">Fish</span>
+      <span class="animal-count" style="color:#1abc9c">16 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/penguin/" class="animal-card" style="border-color:#607d8b20">
+      <span class="animal-emoji">🐧</span>
+      <span class="animal-label">Penguin</span>
+      <span class="animal-count" style="color:#607d8b">14 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/bee/" class="animal-card" style="border-color:#ffd60020">
+      <span class="animal-emoji">🐝</span>
+      <span class="animal-label">Bee</span>
+      <span class="animal-count" style="color:#ffd600">14 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/horse/" class="animal-card" style="border-color:#a0522d20">
+      <span class="animal-emoji">🐴</span>
+      <span class="animal-label">Horse</span>
+      <span class="animal-count" style="color:#a0522d">12 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/rabbit/" class="animal-card" style="border-color:#ec407a20">
+      <span class="animal-emoji">🐰</span>
+      <span class="animal-label">Rabbit</span>
+      <span class="animal-count" style="color:#ec407a">12 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/bear/" class="animal-card" style="border-color:#8d6e6320">
+      <span class="animal-emoji">🐻</span>
+      <span class="animal-label">Bear</span>
+      <span class="animal-count" style="color:#8d6e63">11 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/snake/" class="animal-card" style="border-color:#43a04720">
+      <span class="animal-emoji">🐍</span>
+      <span class="animal-label">Snake</span>
+      <span class="animal-count" style="color:#43a047">11 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/pig/" class="animal-card" style="border-color:#ff8f0020">
+      <span class="animal-emoji">🐷</span>
+      <span class="animal-label">Pig</span>
+      <span class="animal-count" style="color:#ff8f00">11 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/dolphin/" class="animal-card" style="border-color:#00acc120">
+      <span class="animal-emoji">🐬</span>
+      <span class="animal-label">Dolphin</span>
+      <span class="animal-count" style="color:#00acc1">9 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/frog/" class="animal-card" style="border-color:#66bb6a20">
+      <span class="animal-emoji">🐸</span>
+      <span class="animal-label">Frog</span>
+      <span class="animal-count" style="color:#66bb6a">9 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/shark/" class="animal-card" style="border-color:#5c6bc020">
+      <span class="animal-emoji">🦈</span>
+      <span class="animal-label">Shark</span>
+      <span class="animal-count" style="color:#5c6bc0">16 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/cow/" class="animal-card" style="border-color:#f39c1220">
+      <span class="animal-emoji">🐄</span>
+      <span class="animal-label">Cow</span>
+      <span class="animal-count" style="color:#f39c12">8 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/turtle/" class="animal-card" style="border-color:#27ae6020">
+      <span class="animal-emoji">🐢</span>
+      <span class="animal-label">Turtle</span>
+      <span class="animal-count" style="color:#27ae60">8 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/owl/" class="animal-card" style="border-color:#7986cb20">
+      <span class="animal-emoji">🦉</span>
+      <span class="animal-label">Owl</span>
+      <span class="animal-count" style="color:#7986cb">16 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/parrot/" class="animal-card" style="border-color:#e74c3c20">
+      <span class="animal-emoji">🦜</span>
+      <span class="animal-label">Parrot</span>
+      <span class="animal-count" style="color:#e74c3c">8 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/elephant/" class="animal-card" style="border-color:#9e9e9e20">
+      <span class="animal-emoji">🐘</span>
+      <span class="animal-label">Elephant</span>
+      <span class="animal-count" style="color:#9e9e9e">12 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/lion/" class="animal-card" style="border-color:#f1c40f20">
+      <span class="animal-emoji">🦁</span>
+      <span class="animal-label">Lion</span>
+      <span class="animal-count" style="color:#f1c40f">6 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/whale/" class="animal-card" style="border-color:#1565c020">
+      <span class="animal-emoji">🐋</span>
+      <span class="animal-label">Whale</span>
+      <span class="animal-count" style="color:#1565c0">7 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/duck/" class="animal-card" style="border-color:#26a69a20">
+      <span class="animal-emoji">🦆</span>
+      <span class="animal-label">Duck</span>
+      <span class="animal-count" style="color:#26a69a">5 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/spider/" class="animal-card" style="border-color:#61616120">
+      <span class="animal-emoji">🕷️</span>
+      <span class="animal-label">Spider</span>
+      <span class="animal-count" style="color:#616161">5 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/ant/" class="animal-card" style="border-color:#79554820">
+      <span class="animal-emoji">🐜</span>
+      <span class="animal-label">Ant</span>
+      <span class="animal-count" style="color:#795548">4 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/elephant/" class="animal-card" style="border-color:#9e9e9e20">
+      <span class="animal-emoji">🐘</span>
+      <span class="animal-label">Elephant</span>
+      <span class="animal-count" style="color:#9e9e9e">12 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/owl/" class="animal-card" style="border-color:#7986cb20">
+      <span class="animal-emoji">🦉</span>
+      <span class="animal-label">Owl</span>
+      <span class="animal-count" style="color:#7986cb">16 facts</span>
+    </a>
+    <a href="https://smartassfacts.com/facts/animals/shark/" class="animal-card" style="border-color:#5c6bc020">
+      <span class="animal-emoji">🦈</span>
+      <span class="animal-label">Shark</span>
+      <span class="animal-count" style="color:#5c6bc0">16 facts</span>
+    </a>
+    </div>
+    
+  <!-- injected: myth-vs-links -->
+  <div style="max-width:960px;margin:0 auto;padding:32px 16px 0">
+    <div style="margin-bottom:32px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+        <h2 style="font-size:1rem;font-weight:800;color:#e0e0e0;margin:0">🔬 Myths Debunked</h2>
+        <a href="https://smartassfacts.com/facts/myths/" style="font-size:0.82rem;color:#e94560;text-decoration:none">All 30 myths →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
+      <a href="https://smartassfacts.com/facts/myths/goldfish-have-three-second-memories/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(233,69,96,0.04);border:1px solid rgba(233,69,96,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🐠</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Goldfish Have 3-Second Memories</span>
+      </a>
+      <a href="https://smartassfacts.com/facts/myths/bulls-are-enraged-by-the-color-red/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(233,69,96,0.04);border:1px solid rgba(233,69,96,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🐂</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Bulls Are Enraged by the Color Red</span>
+      </a>
+      <a href="https://smartassfacts.com/facts/myths/bats-are-blind/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(233,69,96,0.04);border:1px solid rgba(233,69,96,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🦇</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Bats Are Blind</span>
+      </a>
+      <a href="https://smartassfacts.com/facts/myths/dogs-are-completely-colorblind/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(233,69,96,0.04);border:1px solid rgba(233,69,96,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🐕</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Dogs Are Completely Colourblind</span>
+      </a>
+      </div>
+    </div>
+    <div style="margin-bottom:32px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
+        <h2 style="font-size:1rem;font-weight:800;color:#e0e0e0;margin:0">⚖️ vs Comparisons</h2>
+        <a href="https://smartassfacts.com/facts/vs/" style="font-size:0.82rem;color:#64b5f6;text-decoration:none">All 20 comparisons →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
+      <a href="https://smartassfacts.com/facts/vs/alligator-vs-crocodile/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(33,150,243,0.04);border:1px solid rgba(33,150,243,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🐊</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Alligator vs Crocodile</span>
+      </a>
+      <a href="https://smartassfacts.com/facts/vs/venomous-vs-poisonous/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(33,150,243,0.04);border:1px solid rgba(33,150,243,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🐍</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Venomous vs Poisonous</span>
+      </a>
+      <a href="https://smartassfacts.com/facts/vs/bison-vs-buffalo/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(33,150,243,0.04);border:1px solid rgba(33,150,243,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🦬</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Bison vs Buffalo</span>
+      </a>
+      <a href="https://smartassfacts.com/facts/vs/tortoise-vs-turtle/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(33,150,243,0.04);border:1px solid rgba(33,150,243,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
+        <span style="font-size:1.5rem;flex-shrink:0">🐢</span>
+        <span style="font-size:0.88rem;font-weight:600;color:#e0e0e0;line-height:1.4">Tortoise vs Turtle</span>
+      </a>
+      </div>
+    </div>
+  </div>
+  <!-- /injected: myth-vs-links -->
+    
+  
+    <div class="educator-cta" style="margin:40px 0;padding:20px 24px;background:rgba(171,71,188,0.07);border:1px solid rgba(171,71,188,0.2);border-radius:12px;">
+      <p style="font-size:0.95rem;color:#ddd;margin-bottom:10px;">
+        📚 <strong>Using these animal facts in the classroom?</strong><br>
+        <span style="color:#aaa;font-size:0.9rem;">SmartAss Facts has a free embeddable quiz widget and curriculum-aligned resources for teachers.</span>
+      </p>
+      <a href="https://smartassfacts.com/for-educators/" style="display:inline-block;margin-right:12px;padding:8px 16px;background:#ab47bc;color:#fff;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;">For Educators →</a>
+      <a href="https://smartassfacts.com/embed/quiz/" style="display:inline-block;padding:8px 16px;border:1px solid #ab47bc;color:#ab47bc;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;">Embed the Quiz</a>
+    </div>
+    </div>
+
+    
+
+
+    <footer class="saf-footer">
+      <div class="saf-footer-links">
+        <a href="/facts/">Facts</a>
+        <a href="/facts/myths/">Myths Debunked</a>
+        <a href="/facts/vs/">vs Comparisons</a>
+        <a href="/random/">Random Facts</a>
+        <a href="/for-educators/">For Educators</a>
+        <a href="/embed/quiz/">Quiz Widget</a>
+        <a href="/about/gigi-smarts/">About</a>
+      </div>
+      <p class="saf-footer-copy">© 2026 SmartAss Facts — All claims sourced to peer-reviewed research.</p>
+    </footer>
+
+</body>
+</html>

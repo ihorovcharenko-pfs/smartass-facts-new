@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import factPaths from './fact-urls.json'
+import staticContentPaths from '../static-content-paths.json'
 
 const BASE = 'https://smartassfacts.com'
 
@@ -45,5 +46,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }))
 
-  return [...staticEntries, ...categoryEntries, ...factEntries]
+  // Restored static SEO pages (myths, vs, topics, countries, people, animals,
+  // sub-topic pages) served from /public via proxy.ts. These are the site's
+  // strongest search performers, so give them a higher priority.
+  const staticContentEntries: MetadataRoute.Sitemap = (staticContentPaths as string[])
+    .filter(p => p !== '/embed/quiz/')
+    .map(p => ({
+      url: `${BASE}${p}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }))
+
+  return [...staticEntries, ...categoryEntries, ...factEntries, ...staticContentEntries]
 }
