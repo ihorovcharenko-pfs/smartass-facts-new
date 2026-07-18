@@ -3,9 +3,11 @@
 // statement + verdict are in the initial HTML.
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd'
 import FactDetailPage from '@/components/FactDetailPage'
 import { getFactByIdServer } from '@/services/serverData'
 import { decryptAnswer } from '@/utils/decryption'
+import { getDisplayName } from '@/utils/categoryNames'
 
 type Params = { params: Promise<{ category: string; slug: string }> }
 
@@ -41,12 +43,21 @@ export default async function Page({ params }: Params) {
   }
 
   return (
-    <FactDetailPage
-      categorySlug={category}
-      factSlug={slug}
-      initialFact={data.fact}
-      initialRelated={data.related}
-      initialIsReal={initialIsReal}
-    />
+    <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'All Facts', url: 'https://smartassfacts.com/facts/' },
+          { name: getDisplayName(category), url: `https://smartassfacts.com/facts/${category}/` },
+          { name: data.fact.saFact },
+        ]}
+      />
+      <FactDetailPage
+        categorySlug={category}
+        factSlug={slug}
+        initialFact={data.fact}
+        initialRelated={data.related}
+        initialIsReal={initialIsReal}
+      />
+    </>
   )
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd'
 import RandomFactsPage from '@/components/RandomFactsPage'
 
 export const metadata: Metadata = {
@@ -8,5 +9,15 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <RandomFactsPage />
+  return (
+    <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: 'https://smartassfacts.com/' },
+          { name: 'Random Facts' },
+        ]}
+      />
+      <RandomFactsPage />
+    </>
+  )
 }

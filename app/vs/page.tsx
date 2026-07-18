@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd'
 import VsPage from '@/components/VsPage'
 
 export const metadata: Metadata = {
@@ -8,5 +9,15 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <VsPage />
+  return (
+    <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: 'https://smartassfacts.com/' },
+          { name: 'vs Comparisons' },
+        ]}
+      />
+      <VsPage />
+    </>
+  )
 }
