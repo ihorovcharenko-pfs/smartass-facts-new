@@ -13,6 +13,7 @@ const COMPARISONS = [
   { emoji: '☄️', title: 'Asteroid vs Meteor vs Meteorite', slug: 'asteroid-vs-meteor-vs-meteorite', desc: 'The same space rock gets three different names depending on where it is. One burns up, one lands.' },
   { emoji: '⚛️', title: 'Atom vs Molecule', slug: 'atom-vs-molecule', desc: 'An atom is the smallest unit of an element. A molecule is two or more atoms bonded together. Water is a molecule.' },
   { emoji: '🦬', title: 'Bison vs Buffalo', slug: 'bison-vs-buffalo', desc: 'American bison are not true buffalo. True buffalo live in Africa and Asia. The mix-up has a historical origin.' },
+  { emoji: '⚔️', title: 'Bronze Age vs Iron Age', slug: 'bronze-age-vs-iron-age', desc: 'The metals, the dates, and the collapse that separated them. Iron won on abundance, not strength.' },
   { emoji: '🏗️', title: 'Cement vs Concrete', slug: 'cement-vs-concrete', desc: 'Cement is an ingredient in concrete, not the same thing. What concrete actually contains and why builders care.' },
   { emoji: '🤧', title: 'Cold vs Flu', slug: 'cold-vs-flu', desc: 'Similar symptoms, very different severity. Flu means fever, sudden onset, and severe fatigue. When to see a doctor.' },
   { emoji: '🌡️', title: 'Conduction vs Convection vs Radiation', slug: 'conduction-vs-convection-vs-radiation', desc: 'Three ways heat travels: direct contact, fluid movement, and electromagnetic waves — the last works in a vacuum.' },
@@ -82,7 +83,7 @@ export default function VsPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   useEffect(() => {
-    document.title = 'vs Comparisons — 49 Commonly Confused Terms Explained | SmartAss Facts'
+    document.title = 'vs Comparisons — 50 Commonly Confused Terms Explained | SmartAss Facts'
     const canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
     if (canonical) canonical.href = 'https://smartassfacts.com/facts/vs/'
     document.documentElement.setAttribute('data-prerender-ready', 'true')
@@ -102,12 +103,12 @@ export default function VsPage() {
           <h1 className="vs-hero__h1">vs Comparisons</h1>
           <p className="vs-hero__sub">
             The clearest answer to &ldquo;what&rsquo;s the difference between X and Y?&rdquo;
-            49 pairs. Every distinction explained.
+            50 pairs. Every distinction explained.
           </p>
 
           <div className="vs-stats">
             <div className="vs-stat">
-              <span className="vs-stat__num">49</span>
+              <span className="vs-stat__num">50</span>
               <span className="vs-stat__label">Comparisons</span>
             </div>
             <div className="vs-stat">

@@ -33,6 +33,17 @@ function Footer() {
           {navLink(RANDOM_PATH, 'Random Facts')}
         </div>
 
+        {/* ── Reader favourites — site-wide internal links to the pages
+               closest to page 1 in search (plain anchors: static targets). ── */}
+        <div className="footer__col">
+          <h4 className="footer__col-heading">Reader Favourites</h4>
+          <a href="/facts/myths/einstein-failed-math-in-school/" className="footer__link">Did Einstein Fail Math?</a>
+          <a href="/facts/guinness-world-records/1100-the-world-s-longest-yawn-was-clocked-at-21-seconds-the-soul/" className="footer__link">World&rsquo;s Longest Yawn Record</a>
+          <a href="/facts/myths/bats-are-blind/" className="footer__link">Are Bats Really Blind?</a>
+          <a href="/facts/vs/accuracy-vs-precision/" className="footer__link">Accuracy vs Precision</a>
+          <a href="/facts/myths/hair-nails-grow-after-death/" className="footer__link">Do Nails Grow After Death?</a>
+        </div>
+
         {/* ── Company ──────────────────────────────────────────────── */}
         <div className="footer__col">
           <h4 className="footer__col-heading">Company</h4>

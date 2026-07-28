@@ -88,7 +88,7 @@ export default function FactsPage() {
           <div className="facts-stats">
             <div className="facts-stat"><span className="facts-stat__num">5,000+</span><span className="facts-stat__label">Verified facts</span></div>
             <div className="facts-stat"><span className="facts-stat__num">51</span><span className="facts-stat__label">Myths debunked</span></div>
-            <div className="facts-stat"><span className="facts-stat__num">49</span><span className="facts-stat__label">Concept comparisons</span></div>
+            <div className="facts-stat"><span className="facts-stat__num">50</span><span className="facts-stat__label">Concept comparisons</span></div>
             <div className="facts-stat"><span className="facts-stat__num">38</span><span className="facts-stat__label">Categories</span></div>
           </div>
         </div>

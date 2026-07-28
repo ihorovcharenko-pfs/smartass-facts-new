@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext'
 import { fetchFactsByCategory } from '../services/clientService'
 import type { CategoryPageFact, CategoryPageResponse } from '../services/clientService'
 import { getDisplayName, buildFactSlug } from '../utils/categoryNames'
+import { getCategoryCopy } from '../utils/categoryCopy'
 import '../styles/CategoryPage.scss'
 
 export default function CategoryPage({
@@ -23,6 +24,10 @@ export default function CategoryPage({
   const [notFound, setNotFound] = useState(initialData ? initialData.total === 0 : false)
 
   const displayName = getDisplayName(categorySlug)
+  const copy = getCategoryCopy(categorySlug)
+  // H1 leads with the searched keyword ("Music Facts"); the branded saCategory
+  // name ("Offbeat Brilliance") stays visible as a tagline.
+  const h1 = copy ? `${copy.plain} Facts` : displayName
 
   useEffect(() => {
     // Page 1 is already server-rendered (initialData). Only fetch when the user
@@ -65,13 +70,19 @@ export default function CategoryPage({
       <nav className="cat-page__breadcrumb" aria-label="breadcrumb">
         <a href="/facts" onClick={e => { e.preventDefault(); navigate('/facts') }}>All Facts</a>
         <span className="cat-page__sep">›</span>
-        <span>{displayName}</span>
+        <span>{copy?.plain ?? displayName}</span>
       </nav>
 
       <div className="cat-page__header">
-        <h1 className="cat-page__h1">{displayName}</h1>
+        <h1 className="cat-page__h1">{h1}</h1>
         <span className="cat-page__count">{total} facts</span>
       </div>
+      {copy && (
+        <>
+          <p className="cat-page__aka">aka &ldquo;{displayName}&rdquo;</p>
+          <p className="cat-page__intro">{copy.intro}</p>
+        </>
+      )}
 
       <div className="cat-page__list">
         {facts.map(fact => {

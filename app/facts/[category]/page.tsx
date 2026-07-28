@@ -5,17 +5,24 @@ import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd'
 import CategoryPage from '@/components/CategoryPage'
 import { getFactsByCategoryServer } from '@/services/serverData'
 import { getDisplayName } from '@/utils/categoryNames'
+import { getCategoryCopy } from '@/utils/categoryCopy'
 
 type Params = { params: Promise<{ category: string }> }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { category } = await params
+  const copy = getCategoryCopy(category)
   const displayName = getDisplayName(category)
   const data = await getFactsByCategoryServer(category, 1)
   const thin = data === null || data.total < 5
   return {
-    title: `${displayName} Facts | SmartAss Facts`,
-    description: `Surprising ${displayName} facts — can you tell which are real and which are fake?`,
+    // Lead with the searched keyword ("Music Facts"), not the branded
+    // saCategory name ("Offbeat Brilliance") — that's what queries match.
+    title: copy
+      ? `${copy.plain} Facts — Surprising & Verified | SmartAss Facts`
+      : `${displayName} Facts | SmartAss Facts`,
+    description: copy?.description
+      ?? `Surprising ${displayName} facts — can you tell which are real and which are fake?`,
     alternates: { canonical: `https://smartassfacts.com/facts/${category}/` },
     ...(thin && { robots: { index: false, follow: true } }),
   }
@@ -29,7 +36,7 @@ export default async function Page({ params }: Params) {
       <BreadcrumbJsonLd
         items={[
           { name: 'All Facts', url: 'https://smartassfacts.com/facts/' },
-          { name: getDisplayName(category) },
+          { name: getCategoryCopy(category)?.plain ?? getDisplayName(category) },
         ]}
       />
       <CategoryPage categorySlug={category} initialData={initialData} />

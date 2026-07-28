@@ -63,6 +63,26 @@
     flex-wrap: wrap;
   }
 
+  // When the aka/intro block follows, tighten the header's bottom gap.
+  &__header:has(+ .cat-page__aka) {
+    margin-bottom: 0.25rem;
+  }
+
+  &__aka {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin: 0 0 0.75rem;
+  }
+
+  &__intro {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    max-width: 640px;
+    margin: 0 0 2rem;
+  }
+
   &__h1 {
     font-family: var(--font-space-grotesk), sans-serif;
     font-size: clamp(1.5rem, 4vw, 2rem);
