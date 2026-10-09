@@ -29,19 +29,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const categorySlugs = [...new Set(facts.map(p => p.split('/')[0]))]
 
   const staticEntries: MetadataRoute.Sitemap = staticRoutes.map(path => ({
-    url: `${BASE}${path}`,
+    url: `${BASE}${path}/`,
     changeFrequency: 'weekly' as const,
     priority: path === '' ? 1 : 0.7,
   }))
 
   const categoryEntries: MetadataRoute.Sitemap = categorySlugs.map(slug => ({
-    url: `${BASE}/facts/${slug}`,
+    url: `${BASE}/facts/${slug}/`,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }))
 
   const factEntries: MetadataRoute.Sitemap = facts.map(p => ({
-    url: `${BASE}/facts/${p}`,
+    url: `${BASE}/facts/${p}/`,
     changeFrequency: 'monthly' as const,
     priority: 0.5,
   }))
