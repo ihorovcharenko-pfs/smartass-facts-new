@@ -4,6 +4,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import BreadcrumbJsonLd from '@/components/BreadcrumbJsonLd'
+import FactJsonLd from '@/components/FactJsonLd'
 import FactDetailPage from '@/components/FactDetailPage'
 import { getFactByIdServer } from '@/services/serverData'
 import { decryptAnswer } from '@/utils/decryption'
@@ -50,6 +51,12 @@ export default async function Page({ params }: Params) {
           { name: getDisplayName(category), url: `https://smartassfacts.com/facts/${category}/` },
           { name: data.fact.saFact },
         ]}
+      />
+      <FactJsonLd
+        url={`https://smartassfacts.com/facts/${category}/${slug}/`}
+        statement={data.fact.saFact}
+        explanation={data.fact.explanation}
+        isReal={initialIsReal}
       />
       <FactDetailPage
         categorySlug={category}
