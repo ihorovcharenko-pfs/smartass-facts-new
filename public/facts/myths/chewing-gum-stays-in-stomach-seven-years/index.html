@@ -289,6 +289,14 @@
     .saf-site-header__name { display: none; }
     .saf-site-header__link { display: none; }
   }
+
+  /* SITE FOOTER (mirrors components/Footer.tsx) */
+  :root{--color-bg:#0b0b16;--color-surface:#13131f;--color-border:#2a2a3e;--color-primary:#F06030;--color-primary-hover:#d4522a;--color-text:#e8e8f0;--color-text-muted:#8888a8;--font-inter:Inter}
+  footer.footer{padding:0;text-align:left;font-size:16px;color:var(--color-text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;margin-top:48px}
+  footer.footer a{color:inherit}
+  footer.footer h3,footer.footer h4{line-height:1.3}
+  .footer{background-color:var(--color-surface);border-top:1px solid var(--color-border);width:100%;margin-top:auto}.footer__top{display:grid;grid-template-columns:1fr .7fr 2.2fr;gap:3rem;padding:2.5rem 3rem 2rem;max-width:1200px;margin:0 auto;width:100%}@media(max-width: 960px){.footer__top{grid-template-columns:1fr 1fr;gap:2rem;padding:2rem 1.5rem}}@media(max-width: 480px){.footer__top{grid-template-columns:1fr;gap:1.75rem;padding:1.5rem}}.footer__col{display:flex;flex-direction:column;gap:.5rem}.footer__col--newsletter{gap:.875rem}@media(max-width: 960px)and (min-width: 481px){.footer__col--newsletter{grid-column:1/-1}}.footer__col-heading{font-family:var(--font-inter),sans-serif;font-size:.8125rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-muted);margin-bottom:.375rem}.footer__link{color:var(--color-text-muted);text-decoration:none;font-size:.9rem;font-weight:400;transition:color .15s;width:fit-content}.footer__link:hover{color:var(--color-text)}.footer__social{display:flex;align-items:center;gap:1.25rem;margin-top:.25rem}.footer__social-link{display:flex;align-items:center;justify-content:center;text-decoration:none;transition:opacity .2s}.footer__social-link img{display:block}.footer__social-link:hover{opacity:.65}.footer__bottom{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:1.125rem 3rem;border-top:1px solid var(--color-border);max-width:1200px;margin:0 auto;width:100%}@media(max-width: 768px){.footer__bottom{flex-wrap:wrap;gap:.75rem;padding:1rem 1.5rem}}@media(max-width: 480px){.footer__bottom{flex-direction:column;align-items:flex-start;gap:.75rem;padding:1rem 1.5rem}}.footer__bottom-left{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}@media(max-width: 480px){.footer__bottom-left{flex-direction:column;align-items:flex-start;gap:.5rem}}.footer__logo-wrap{cursor:pointer;flex-shrink:0}.footer__logo{height:1.75rem;width:auto;opacity:.7;filter:brightness(0.8);transition:opacity .15s}.footer__logo:hover{opacity:1}.footer__legal{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.footer__legal-link{font-size:.8125rem;color:var(--color-text-muted);text-decoration:none;transition:color .15s;white-space:nowrap}.footer__legal-link:hover{color:var(--color-text)}.footer__legal-sep{font-size:.75rem;color:var(--color-border);user-select:none}.footer__copy{font-size:.8125rem;color:var(--color-text-muted);white-space:nowrap}@media(max-width: 480px){.footer__copy{white-space:normal}}.mc-form{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}.mc-form__copy{flex-shrink:0}.mc-form__title{font-size:1.125rem;font-weight:700;color:var(--color-text);margin:0 0 .25rem;font-family:var(--font-inter),sans-serif}.mc-form__subtitle{font-size:.8125rem;color:var(--color-text-muted);margin:0;max-width:22ch;line-height:1.4}.mc-form__fields{display:flex;flex-direction:column;gap:.625rem;flex:1;min-width:280px}.mc-form__name-row{display:flex;gap:.5rem}.mc-form__email-row{display:flex;gap:.5rem}.mc-form__input{flex:1;padding:.5rem .75rem;border:1.5px solid var(--color-border);border-radius:10px;font-size:.875rem;font-family:var(--font-inter),system-ui,-apple-system,sans-serif;color:var(--color-text);background:var(--color-bg);outline:none;transition:border-color .2s;min-width:0}.mc-form__input::placeholder{color:var(--color-text-muted)}.mc-form__input:focus{border-color:var(--color-primary)}.mc-form__input--email{flex:2}.mc-form__button{flex-shrink:0;padding:.5rem 1.25rem;background:var(--color-primary);color:#fff;border:none;border-radius:10px;font-size:.875rem;font-weight:600;font-family:var(--font-inter),sans-serif;cursor:pointer;transition:background .2s;white-space:nowrap}.mc-form__button:hover{background:var(--color-primary-hover)}.mc-form--success{align-items:center;gap:.75rem;flex-wrap:nowrap}.mc-form__success-icon{font-size:1.5rem;flex-shrink:0}.mc-form__success-text{font-size:.875rem;color:var(--color-text-muted);margin:0;font-family:var(--font-inter),system-ui,-apple-system,sans-serif}@media(max-width: 768px){.mc-form{flex-direction:column;align-items:flex-start;gap:1rem}.mc-form__fields{width:100%;min-width:unset}.mc-form__subtitle{max-width:none}}@media(max-width: 400px){.mc-form__name-row{flex-direction:column}.mc-form__email-row{flex-direction:column}.mc-form__button{width:100%}}
+
 </style>
 </head>
 <body>
@@ -304,17 +312,6 @@
     <a href="/" class="saf-site-header__play">&#9654; Play Now</a>
   </nav>
 </header>
-
-  <nav class="saf-topnav">
-    <a href="/" class="saf-brand">SmartAss<span>Facts</span></a>
-    <div class="saf-nav-links">
-      <a href="/facts/">Facts</a>
-      <a href="/facts/myths/">Myths</a>
-      <a href="/facts/vs/">vs</a>
-      <a href="/random/">Random</a>
-      <a href="/" class="saf-play-btn">▸ Play</a>
-    </div>
-  </nav>
 
   <div class="container">
 
@@ -503,18 +500,69 @@
       <a href="/" class="saf-play-bar-btn">▸ Play the Game</a>
     </div>
 
-    <footer class="saf-footer">
-      <div class="saf-footer-links">
-        <a href="/facts/">Facts</a>
-        <a href="/facts/myths/">Myths Debunked</a>
-        <a href="/facts/vs/">vs Comparisons</a>
-        <a href="/random/">Random Facts</a>
-        <a href="/for-educators/">For Educators</a>
-        <a href="/embed/quiz/">Quiz Widget</a>
-        <a href="/about/gigi-smarts/">About</a>
+    <footer class="footer">
+  <div class="footer__top">
+    <div class="footer__col">
+      <h4 class="footer__col-heading">Explore</h4>
+      <a href="/facts/" class="footer__link">All Facts</a>
+      <a href="/myths/" class="footer__link">Myths Debunked</a>
+      <a href="/vs/" class="footer__link">VS Comparisons</a>
+      <a href="/random/" class="footer__link">Random Facts</a>
+    </div>
+    <div class="footer__col">
+      <h4 class="footer__col-heading">Reader Favourites</h4>
+      <a href="/facts/myths/einstein-failed-math-in-school/" class="footer__link">Did Einstein Fail Math?</a>
+      <a href="/facts/guinness-world-records/1100-the-world-s-longest-yawn-was-clocked-at-21-seconds-the-soul/" class="footer__link">World&rsquo;s Longest Yawn Record</a>
+      <a href="/facts/myths/bats-are-blind/" class="footer__link">Are Bats Really Blind?</a>
+      <a href="/facts/vs/accuracy-vs-precision/" class="footer__link">Accuracy vs Precision</a>
+      <a href="/facts/myths/hair-nails-grow-after-death/" class="footer__link">Do Nails Grow After Death?</a>
+    </div>
+    <div class="footer__col">
+      <h4 class="footer__col-heading">Company</h4>
+      <a href="/about/" class="footer__link">About Us</a>
+      <a href="/how-it-works/" class="footer__link">How It Works</a>
+      <a href="/educators/" class="footer__link">For Educators</a>
+    </div>
+    <div class="footer__col footer__col--newsletter">
+      <h4 class="footer__col-heading">Stay in the Loop</h4>
+      <div class="mc-form">
+        <div class="mc-form__copy">
+          <h3 class="mc-form__title">Get smarter, daily</h3>
+          <p class="mc-form__subtitle">A weekly dose of surprising facts straight to your inbox.</p>
+        </div>
+        <form action="https://smartassfacts.us15.list-manage.com/subscribe/post?u=042a501513b6fdea97b06ce81&amp;id=85eb6eaa5d&amp;f_id=00f3a6e0f0" method="post" name="mc-embedded-subscribe-form" target="_blank" novalidate>
+          <div class="mc-form__fields">
+            <div class="mc-form__name-row">
+              <input type="text" name="FNAME" placeholder="First name" class="mc-form__input" autocomplete="given-name">
+              <input type="text" name="LNAME" placeholder="Last name" class="mc-form__input" autocomplete="family-name">
+            </div>
+            <div class="mc-form__email-row">
+              <input type="email" name="EMAIL" placeholder="Email address *" required class="mc-form__input mc-form__input--email" autocomplete="email">
+              <button type="submit" name="subscribe" class="mc-form__button">Subscribe</button>
+            </div>
+          </div>
+          <div aria-hidden="true" style="position:absolute;left:-5000px"><input type="text" name="b_042a501513b6fdea97b06ce81_85eb6eaa5d" tabindex="-1" value=""></div>
+        </form>
       </div>
-      <p class="saf-footer-copy">© 2026 SmartAss Facts — All claims sourced to peer-reviewed research.</p>
-    </footer>
+      <div class="footer__social">
+        <a href="https://www.instagram.com/smartass.facts" class="footer__social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/footer-icons/ig.svg" alt="Instagram" width="20" height="20"></a>
+        <a href="https://www.tiktok.com/@smartassfacts" class="footer__social-link" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/footer-icons/tt.svg" alt="TikTok" width="20" height="20"></a>
+        <a href="https://www.youtube.com/@SmartAssFactsDaily" class="footer__social-link" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><img src="/footer-icons/yt.svg" alt="YouTube" width="20" height="20"></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <div class="footer__bottom-left">
+      <a href="/" class="footer__logo-wrap"><img src="/smartass-logo.png" alt="SmartAss Facts" class="footer__logo" width="28" height="28"></a>
+      <div class="footer__legal">
+        <a href="/cookies/" class="footer__legal-link">Cookie Policy</a><span class="footer__legal-sep">·</span>
+        <a href="/terms/" class="footer__legal-link">Terms of Service</a><span class="footer__legal-sep">·</span>
+        <a href="/privacy/" class="footer__legal-link">Privacy Policy</a>
+      </div>
+    </div>
+    <span class="footer__copy">© 2026 SmartAss Facts. All rights reserved.</span>
+  </div>
+</footer>
 
 </body>
 </html>

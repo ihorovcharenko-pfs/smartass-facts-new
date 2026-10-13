@@ -56,6 +56,16 @@ const MYTHS = [
   { emoji: '🍕', title: 'The Five-Second Rule Makes Dropped Food Safe', desc: 'False. Bacteria transfer on contact, not after five seconds. A Rutgers University study found contamination in every single trial, including at under one second of contact.' , slug: 'five-second-rule-food-is-safe' },
   { emoji: '📡', title: 'Microwave Ovens Cook Food From the Inside Out', desc: 'False. Microwaves penetrate 1–3 cm and heat the outer layers first; heat then conducts inward. This is why the outside of food is hot while the centre remains cold.' , slug: 'microwave-ovens-cook-food-from-inside-out' },
   { emoji: '🥠', title: 'Fortune Cookies Are Chinese', desc: 'False. Fortune cookies were invented by Japanese-Americans in California in the early 1900s. They are virtually unknown as a traditional food in China.' , slug: 'fortune-cookies-are-chinese' },
+  { emoji: '🔥', title: '"Follow your passion" is the best career advice', desc: 'Misleading. People told to "follow their passion" are 55% more likely to quit when work gets hard. Passion comes AFTER mastery, not before.', slug: 'follow-your-passion-career-myth', href: '/facts/myths/careers/follow-your-passion-career-myth/' },
+  { emoji: '🦘', title: 'Job hopping will kill your career reputation', desc: 'False. Internal raises: 3%. New job offer: 10–20%. Job hoppers earn up to 50% MORE over a decade.', slug: 'job-hopping-career-myth', href: '/facts/myths/careers/job-hopping-career-myth/' },
+  { emoji: '🗣️', title: 'Extroverts make the best salespeople and leaders', desc: 'False. Ambiverts — the people in between — outsell both introverts AND extroverts by 24%. Extroverts come last.', slug: 'extrovert-sales-leadership-myth', href: '/facts/myths/careers/extrovert-sales-leadership-myth/' },
+  { emoji: '🧩', title: 'Your MBTI type tells you what career is right for you', desc: 'False. Near-zero predictive validity for job performance. The British Psychological Society flagged this decades ago. Your INFJ badge doesn\'t mean what you think.', slug: 'mbti-career-test-myth', href: '/facts/myths/careers/mbti-career-test-myth/' },
+  { emoji: '💰', title: 'Not negotiating your salary only costs you a little', desc: 'False. Not negotiating your starting salary costs the average person over $1 million in lifetime earnings. It compounds every single year.', slug: 'salary-negotiation-myth', href: '/facts/myths/careers/salary-negotiation-myth/' },
+  { emoji: '⏰', title: 'Working more hours means getting more done', desc: 'False. Stanford study: output at 70 hrs/week = output at 55. Zero. Identical. The extra 15 hours disappear.', slug: 'working-more-hours-productivity-myth', href: '/facts/myths/careers/working-more-hours-productivity-myth/' },
+  { emoji: '🤝', title: 'Networking is about working your close relationships', desc: 'Misleading. 56% of jobs found through connections came from acquaintances — NOT close friends. Your network strategy is backwards.', slug: 'networking-weak-ties-myth', href: '/facts/myths/careers/networking-weak-ties-myth/' },
+  { emoji: '🎓', title: 'Your GPA predicts how well you\'ll perform in your career', desc: 'False. GPA correlates with job performance at r = 0.1. That\'s basically zero. Ernst & Young dropped the requirement after finding ZERO evidence it predicted success.', slug: 'gpa-career-performance-myth', href: '/facts/myths/careers/gpa-career-performance-myth/' },
+  { emoji: '🧭', title: 'Successful people found their calling early and stuck with it', desc: 'False. More than HALF of workers over 30 have already changed careers at least once. The "find your path young" story is a myth.', slug: 'career-calling-early-myth', href: '/facts/myths/careers/career-calling-early-myth/' },
+  { emoji: '🪑', title: 'Interviewers evaluate you based on your qualifications', desc: 'False. Unstructured job interviews predict performance at 0.14 — barely better than chance. And the decision was made before you answered a single question.', slug: 'job-interview-snap-judgment-myth', href: '/facts/myths/careers/job-interview-snap-judgment-myth/' },
 ]
 
 const FAQ_ITEMS = [
@@ -84,7 +94,7 @@ export default function MythsPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   useEffect(() => {
-    document.title = 'Myths Debunked — 51 Popular Myths That Are Completely False | SmartAss Facts'
+    document.title = 'Myths Debunked — 61 Popular Myths That Are Completely False | SmartAss Facts'
     const canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
     if (canonical) canonical.href = 'https://smartassfacts.com/facts/myths/'
     document.documentElement.setAttribute('data-prerender-ready', 'true')
@@ -110,7 +120,7 @@ export default function MythsPage() {
             exact origin of the wrong belief.
           </p>
           <div className="myths-stats">
-            <div className="myths-stat"><span className="myths-stat__num">51</span><span className="myths-stat__label">Myths Debunked</span></div>
+            <div className="myths-stat"><span className="myths-stat__num">61</span><span className="myths-stat__label">Myths Debunked</span></div>
             <div className="myths-stat"><span className="myths-stat__num">100%</span><span className="myths-stat__label">Primary Sources</span></div>
             <div className="myths-stat"><span className="myths-stat__num">130</span><span className="myths-stat__label">Citations</span></div>
           </div>
@@ -124,7 +134,7 @@ export default function MythsPage() {
           {MYTHS.map((m, i) => (
             // Plain anchor (no router navigate): the target is a static HTML
             // page served from /public, so a full page load is the right move.
-            <a key={i} className="myth-card" href={`/facts/myths/${m.slug}/`}>
+            <a key={i} className="myth-card" href={m.href ?? `/facts/myths/${m.slug}/`}>
               <div className="myth-card__emoji">{m.emoji}</div>
               <div className="myth-card__body">
                 <span className="myth-card__badge">✗ MYTH</span>
