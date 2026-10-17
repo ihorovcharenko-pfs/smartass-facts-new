@@ -9,6 +9,7 @@ import Header from './Header'
 import Footer from './Footer'
 import AuthModal from './AuthModal'
 import OnboardingModal from './OnboardingModal'
+import CookieBanner from './CookieBanner'
 import { useAuth } from '../context/AuthContext'
 import { getOnboardingData, setOnboardingData } from '../utils/localStorage'
 
@@ -49,6 +50,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {!isGameRoute && <Footer />}
       {showOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <AuthModal />
+      <CookieBanner />
     </div>
   )
 }

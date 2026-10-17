@@ -79,7 +79,7 @@
 
   &__play-now {
     padding: 0.5rem 1.125rem;
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #fff;
     border: none;
     border-radius: 20px;
@@ -89,12 +89,12 @@
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.2s;
-    &:hover { background: var(--color-primary-hover); }
+    &:hover { background: var(--color-primary-solid-hover); }
   }
 
   &__signin {
     padding: 0.5rem 1rem;
-    background: var(--color-fact);
+    background: var(--color-fact-solid);
     border: none;
     color: #fff;
     border-radius: 20px;
@@ -104,7 +104,7 @@
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.2s, transform 0.1s;
-    &:hover { background: #4caf50; }
+    &:hover { background: #388e3c; }
     &:active { transform: scale(0.97); }
   }
 

@@ -156,7 +156,7 @@
   padding: 14px;
   border-radius: 24px;
   border: none;
-  background: var(--color-primary);
+  background: var(--color-primary-solid);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
@@ -165,7 +165,7 @@
   transition: background 0.2s, transform 0.1s;
   margin-top: 0.25rem;
 
-  &:hover:not(:disabled) { background: var(--color-primary-hover); }
+  &:hover:not(:disabled) { background: var(--color-primary-solid-hover); }
   &:active:not(:disabled) { transform: scale(0.98); }
 
   &:disabled {

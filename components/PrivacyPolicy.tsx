@@ -210,7 +210,7 @@ export default function PrivacyPolicy() {
               <li><strong>Usage data</strong> — pages visited, features used, game sessions played, facts swiped, correct/incorrect answers, time spent in-app.</li>
               <li><strong>Device &amp; technical data</strong> — IP address, browser type and version, operating system, device identifiers, screen resolution, language settings.</li>
               <li><strong>Log data</strong> — server logs including timestamps, error reports, referrer URLs, and HTTP response codes.</li>
-              <li><strong>Cookies &amp; similar technologies</strong> — as described in our <a href="/cookie-policy.html">Cookie Policy</a>.</li>
+              <li><strong>Cookies &amp; similar technologies</strong> — as described in our <a href="/cookies/">Cookie Policy</a>.</li>
             </ul>
 
             <h3>2.3 Data from third parties</h3>

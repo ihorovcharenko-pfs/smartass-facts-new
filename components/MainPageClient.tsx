@@ -6,7 +6,6 @@
 // SSR HTML — the whole point of the migration. Search/filter interactivity runs
 // client-side over the already-rendered list.
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import flagIcon from '../assets/flag.png'
 import { getImageUrl, getUserToken, type Group, type Category } from '../services/clientService'
 import { useApp } from '../context/AppContext'
@@ -53,7 +52,10 @@ const CATEGORY_IMAGES: Record<string, string> = {
 }
 
 function getCategoryImage(saCategory: string, apiImageUrl: string | null): string | null {
-  return CATEGORY_IMAGES[saCategory] || (apiImageUrl ? getImageUrl(apiImageUrl) : null)
+  const local = CATEGORY_IMAGES[saCategory]
+  // Encode the filename: a raw "&" or "," in the path 404s on some static servers.
+  if (local) return local.replace(/[^/]+$/, name => encodeURIComponent(name))
+  return apiImageUrl ? getImageUrl(apiImageUrl) : null
 }
 
 // ── Group emoji map (group name → emoji) ──────────────────────────────────────
@@ -71,7 +73,7 @@ interface MainPageClientProps {
 }
 
 function MainPageClient({ groups, categories }: MainPageClientProps) {
-  const { searchText, selectedGroupId, onGroupSelect, onPlayClick, favouriteCategories, navigate } = useApp()
+  const { searchText, onSearchChange, selectedGroupId, onGroupSelect, onPlayClick, favouriteCategories, navigate } = useApp()
 
   // Auth state is read from localStorage, which only exists in the browser.
   // Start logged-out for SSR/first paint, then update after mount.
@@ -122,35 +124,23 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
       <div className="main-page__hero">
         <div className="main-page__hero-inner">
           <span className="main-page__hero-badge">🧠 Trivia Game</span>
-          <h1 className="main-page__hero-heading">Smart Enough to<br /><span className="main-page__hero-accent">Spot the Fake?</span></h1>
+          <h1 className="main-page__hero-heading">Smart Enough to<br className="main-page__hero-br" /> <span className="main-page__hero-accent">Spot the Fake?</span></h1>
           <p className="main-page__hero-sub">Can you tell fact from fiction? Pick a category and find out.</p>
+          {/* The header search is hidden at ≤768px, so phones get this one. */}
+          <input
+            type="search"
+            className="main-page__mobile-search"
+            placeholder="Search categories…"
+            aria-label="Search categories"
+            value={searchText}
+            onChange={e => onSearchChange(e.target.value)}
+          />
         </div>
       </div>
 
       {/* Body: sidebar + grid */}
       <div className="main-page__body">
         <aside className="main-page__sidebar">
-          {/* Explore submenu */}
-          <div className="sidebar__section">
-            <p className="sidebar__section-heading">Explore</p>
-            <a href="/random/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/random') }}>
-              <span className="sidebar__category-icon">🎲</span>
-              <span className="sidebar__category-name">Random Facts</span>
-            </a>
-            <a href="/facts/myths/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/myths') }}>
-              <span className="sidebar__category-icon">🦄</span>
-              <span className="sidebar__category-name">Myths</span>
-            </a>
-            <a href="/facts/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/facts') }}>
-              <span className="sidebar__category-icon">✅</span>
-              <span className="sidebar__category-name">All Facts</span>
-            </a>
-            <a href="/facts/vs/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/vs') }}>
-              <span className="sidebar__category-icon">⚖️</span>
-              <span className="sidebar__category-name">vs Comparisons</span>
-            </a>
-          </div>
-
           {/* Category filters */}
           <div className="sidebar__section">
             <p className="sidebar__section-heading">Categories</p>
@@ -178,6 +168,27 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
               ))}
             </div>
           </div>
+
+          {/* Explore submenu */}
+          <div className="sidebar__section">
+            <p className="sidebar__section-heading">Explore</p>
+            <a href="/random/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/random') }}>
+              <span className="sidebar__category-icon">🎲</span>
+              <span className="sidebar__category-name">Random Facts</span>
+            </a>
+            <a href="/facts/myths/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/myths') }}>
+              <span className="sidebar__category-icon">🦄</span>
+              <span className="sidebar__category-name">Myths</span>
+            </a>
+            <a href="/facts/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/facts') }}>
+              <span className="sidebar__category-icon">✅</span>
+              <span className="sidebar__category-name">All Facts</span>
+            </a>
+            <a href="/facts/vs/" className="sidebar__explore-link" onClick={e => { e.preventDefault(); navigate('/vs') }}>
+              <span className="sidebar__category-icon">⚖️</span>
+              <span className="sidebar__category-name">vs Comparisons</span>
+            </a>
+          </div>
         </aside>
 
         <main className="main-page__content">
@@ -204,11 +215,10 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                 const isGameOfTheDay = category.saCategory.toLowerCase() === 'game of the day' || category.category.toLowerCase() === 'game of the day'
                 const isFavourite = favouriteCategories.includes(category.id)
                 const imgSrc = getCategoryImage(category.saCategory, category.imageUrl)
-                // The first card (Game of the day) is the LCP element on mobile.
-                // next/image `priority` preloads it with high fetchpriority so it
-                // loads early and consistently; the rest lazy-load. next/image also
-                // serves smaller responsive AVIF/WebP (fixes "improve image delivery").
-                const isLcpImage = index === 0
+                // Direct static <img>, all lazy. The LCP is render-delay-gated (main
+                // thread busy hydrating), NOT image-load-gated — the LCP image loads
+                // in ~56ms. So prioritizing/optimizing it doesn't help; keeping the
+                // images simple (no next/image runtime) reduces hydration cost.
                 return (
                   <div
                     key={category.id}
@@ -224,13 +234,15 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                         </div>
                       )}
                       {imgSrc ? (
-                        <Image
+                        <img
                           src={imgSrc}
                           alt={category.saCategory}
-                          fill
-                          sizes="(max-width: 500px) 92vw, (max-width: 1100px) 46vw, 28vw"
                           className="category-card__image"
-                          priority={isLcpImage}
+                          width={400}
+                          height={300}
+                          loading="lazy"
+                          decoding="async"
+                          onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                         />
                       ) : (
                         <div className="category-card__placeholder">

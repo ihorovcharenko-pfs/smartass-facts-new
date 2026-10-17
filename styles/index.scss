@@ -5,8 +5,12 @@
   --color-border: #2a2a3e;
   --color-primary: #F06030;
   --color-primary-hover: #d4522a;
+  // Darker orange for solid fills carrying white text (WCAG AA: 5.2:1 vs 3.3:1)
+  --color-primary-solid: #C2410C;
+  --color-primary-solid-hover: #9A3412;
+  --color-fact-solid: #2E7D32;
   --color-text: #e8e8f0;
-  --color-text-muted: #8888a8;
+  --color-text-muted: #9a9ab8;
   --color-fact: #66bb6a;
   --color-fake: #ef5350;
 }

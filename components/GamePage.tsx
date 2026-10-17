@@ -1,5 +1,6 @@
 'use client'
 
+import { track, type GameMode } from '../utils/analytics'
 import { useState, useEffect, useRef } from 'react'
 import GameHeader from './GameHeader'
 import Footer from './Footer'
@@ -58,6 +59,14 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
 
   // Streak state (only for Daily Challenge)
   const isDaily = category === 'Game of the day'
+  const gameMode: GameMode = onGameComplete ? 'battle' : isDaily ? 'daily' : 'single'
+  const completedTrackedRef = useRef(false)
+
+  // One game_start per mounted game (Play again remounts via a new route push).
+  useEffect(() => {
+    track('game_start', { category, mode: gameMode })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [currentStreak, setCurrentStreak] = useState<number | undefined>(undefined)
   const [streakBroken, setStreakBroken] = useState(false)
   const [streakBeforeBreak, setStreakBeforeBreak] = useState(0)
@@ -204,16 +213,12 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
 
       setAnswers(prev => [...prev, { factId: currentFact.id, isCorrect: correct }])
 
-      setTimeout(() => {
-        setShowResult(true)
-      }, 300)
+      setShowResult(true)
     } catch (error) {
       console.error('Error checking answer:', error)
       setIsCorrect(false)
       setAnswers(prev => [...prev, { factId: currentFact.id, isCorrect: false }])
-      setTimeout(() => {
-        setShowResult(true)
-      }, 300)
+      setShowResult(true)
     }
   }
 
@@ -257,9 +262,15 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
           answers.map(a => ({ factId: a.factId, wasCorrect: a.isCorrect, category }))
         )
 
+        const finalScore = answers.filter(a => a.isCorrect).length
+        if (!completedTrackedRef.current) {
+          completedTrackedRef.current = true
+          track('game_complete', { category, mode: gameMode, score: finalScore, total: totalSteps, percentage: Math.round((finalScore / totalSteps) * 100) })
+        }
+
         // In battle mode the caller owns the results screen
         if (onGameComplete) {
-          const finalCorrect = answers.filter(a => a.isCorrect).length
+          const finalCorrect = finalScore
           onGameComplete(finalCorrect)
         } else {
           setShowResultsDialog(true)
@@ -283,6 +294,8 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
     setFactIsReal(null)
     setShowResult(false)
     setAnswers([])
+    completedTrackedRef.current = false
+    track('game_replay', { category, mode: gameMode })
     onPlayAgain?.(category)
   }
 
@@ -290,6 +303,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
   const handleChallengeFriend = async (): Promise<string> => {
     const factIds = facts.map(f => f.id)
     const result = await createBattle(category, factIds, correctCount)
+    track('challenge_created', { category, mode: gameMode, score: correctCount })
     return `${window.location.origin}/battle/${result.id}`
   }
 

@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { track } from '../utils/analytics'
 import { connectRoomSocket, disconnectRoomSocket } from '../utils/roomSocket'
+import type { Socket } from 'socket.io-client'
 import { fetchCategories, type Category } from '../services/clientService'
 import '../styles/Room.scss'
 
@@ -128,8 +130,13 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   const [errorMsg, setErrorMsg] = useState('')
   const [loading, setLoading] = useState(false)
   const [shareCopied, setShareCopied] = useState(false)
-  const socketRef = useRef(connectRoomSocket())
+  // Connected once, inside the socket effect below. (It used to be
+  // `useRef(connectRoomSocket())`, which re-ran connect() on every render and raced
+  // with the user's first click: "WebSocket is already in CLOSING or CLOSED state".)
+  const socketRef = useRef<Socket>(null as unknown as Socket)
   const mySocketId = useRef<string>('')
+  const isHostRef = useRef(false)
+  const roomMeta = useRef({ category: '', players: 1 })
 
   // ── Fetch categories for create screen ──────────────────────────────────────
   useEffect(() => {
@@ -144,7 +151,8 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
   // ── Socket setup ────────────────────────────────────────────────────────────
   useEffect(() => {
-    const socket = socketRef.current
+    const socket = connectRoomSocket()
+    socketRef.current = socket
     mySocketId.current = socket.id ?? ''
 
     socket.on('connect', () => {
@@ -152,14 +160,20 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     })
 
     socket.on('room:created', ({ code, category, players }) => {
+      isHostRef.current = true
+      roomMeta.current = { category, players: players.length }
+      track('party_room_created', { category, mode: 'party' })
       setLoading(false)
       setErrorMsg('')
       setPhase({ tag: 'lobby', code, category, players, isHost: true })
-      // Update URL so it's shareable
-      navigate(`/room/${code}`, undefined, true)
+      // Update URL so it's shareable. Must NOT go through navigate(): /room and
+      // /room/[code] are different Next pages, so a router replace remounts
+      // RoomPage, whose cleanup disconnects the socket and kills the room.
+      window.history.replaceState(null, '', `/room/${code}/`)
     })
 
     socket.on('room:joined', ({ code, category, players, hostSocketId }) => {
+      roomMeta.current = { category, players: players.length }
       setLoading(false)
       setErrorMsg('')
       setPhase({
@@ -172,6 +186,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     })
 
     socket.on('room:player_joined', ({ player }: { player: PlayerInfo }) => {
+      roomMeta.current.players += 1
       setPhase(prev => {
         if (prev.tag !== 'lobby') return prev
         if (prev.players.find(p => p.socketId === player.socketId)) return prev
@@ -233,6 +248,8 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     })
 
     socket.on('room:finished', ({ finalScores }: { finalScores: FinalScore[] }) => {
+      // Host only, so each Party game is counted once, not once per player.
+      if (isHostRef.current) track('party_game_complete', { category: roomMeta.current.category, mode: 'party', players: finalScores.length, score: finalScores[0]?.score })
       setPhase({ tag: 'finished', finalScores })
     })
 
@@ -281,6 +298,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   }, [phase, joinName])
 
   const handleStart = useCallback(() => {
+    track('party_game_start', { category: roomMeta.current.category, mode: 'party', players: roomMeta.current.players })
     socketRef.current.emit('room:start')
   }, [])
 

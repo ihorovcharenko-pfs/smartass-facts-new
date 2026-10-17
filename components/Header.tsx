@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import logo from '../assets/smartass-logo.png'
 import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
@@ -9,10 +9,14 @@ import searchIcon from '../assets/search.svg'
 import '../styles/Header.scss'
 
 function Header() {
-  const { pathname, searchText, onSearchChange, navigate } = useApp()
+  const { pathname, searchText, onSearchChange, navigate, onPlayClick } = useApp()
   const { user, logout, openAuthModal } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const isMainPage = pathname === '/'
+  // Play Now depends on the route; render it only after mount so the server HTML
+  // and first client render always agree (was a React #418 hydration mismatch).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   const navLinks = (
     <>
@@ -26,18 +30,18 @@ function Header() {
       ) : (
         <button className="header__signin" onClick={() => { openAuthModal('login'); setMenuOpen(false) }}>Sign in</button>
       )}
-      {!isMainPage && (
-        <button className="header__play-now" onClick={() => { navigate('/'); setMenuOpen(false) }}>▶ Play Now</button>
+      {mounted && !isMainPage && (
+        <button className="header__play-now" onClick={() => { onPlayClick('Game of the day'); setMenuOpen(false) }}>▶ Play Now</button>
       )}
     </>
   )
 
   return (
     <header className="header">
-      <div className="header__logo" role="button" tabIndex={0} onClick={() => navigate('/')} onKeyDown={e => e.key === 'Enter' && navigate('/')}>
+      <a href="/" className="header__logo" onClick={e => { e.preventDefault(); setMenuOpen(false); navigate('/') }}>
         <img src={logo.src} alt="SmartAss Facts" width={34} height={34} />
         <span className="header__site-name">SmartAss Facts</span>
-      </div>
+      </a>
 
       {isMainPage && (
         <div className="header__search">

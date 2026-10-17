@@ -11,6 +11,7 @@ import {
   HOW_PATH, RANDOM_PATH, FACTS_PATH, MYTHS_PATH, VS_PATH, EDUCATORS_PATH,
 } from './paths'
 
+import { OPEN_BANNER_EVENT } from '../utils/consent'
 import '../styles/Footer.scss'
 
 function Footer() {
@@ -90,6 +91,8 @@ function Footer() {
             <a href={TERMS_PATH} className="footer__legal-link" onClick={e => { e.preventDefault(); navigate(TERMS_PATH) }}>Terms of Service</a>
             <span className="footer__legal-sep">·</span>
             <a href={PRIVACY_PATH} className="footer__legal-link" onClick={e => { e.preventDefault(); navigate(PRIVACY_PATH) }}>Privacy Policy</a>
+            <span className="footer__legal-sep">·</span>
+            <a href="#cookie-settings" className="footer__legal-link" onClick={e => { e.preventDefault(); window.dispatchEvent(new Event(OPEN_BANNER_EVENT)) }}>Cookie settings</a>
           </div>
         </div>
 

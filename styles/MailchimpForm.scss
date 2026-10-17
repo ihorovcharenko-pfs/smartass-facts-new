@@ -72,7 +72,7 @@
   &__button {
     flex-shrink: 0;
     padding: 0.5rem 1.25rem;
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -84,7 +84,7 @@
     white-space: nowrap;
 
     &:hover {
-      background: var(--color-primary-hover);
+      background: var(--color-primary-solid-hover);
     }
   }
 

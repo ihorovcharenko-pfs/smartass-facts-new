@@ -1,4 +1,7 @@
 .game {
+  // Positioning context for the absolutely-placed back/sound buttons; without it
+  // they sit at the top of the page, underneath the sticky site header.
+  position: relative;
   width: 100%;
   background-color: var(--color-bg);
   min-height: calc(100vh - 64px);

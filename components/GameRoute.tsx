@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import GamePage from './GamePage'
 import GamePageSkeleton from './GamePageSkeleton'
 import { fetchFactsForClient, fetchPersonalizedFacts, type Fact } from '../services/clientService'
@@ -26,7 +27,11 @@ function GameRoute({ navigate }: GameRouteProps) {
   const [gameFacts, setGameFacts] = useState<Fact[]>([])
   const [isLoadingFacts, setIsLoadingFacts] = useState(false)
 
-  const category = getCategoryFromUrl()
+  // Read the category from Next's router state, NOT window.location. On a
+  // client-side push the component can render before the browser URL has
+  // updated (always, once the chunk is cached), which made `category` null and
+  // bounced every game launch back to the home page.
+  const category = useSearchParams().get(CAT_PARAM)
 
   const FOR_YOU_CATEGORY = 'For You'
 

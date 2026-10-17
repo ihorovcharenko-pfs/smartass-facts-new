@@ -193,7 +193,7 @@
   }
 
   &__play-btn {
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #fff;
     border: none;
     padding: 0.625rem 1.5rem;
@@ -204,7 +204,7 @@
     cursor: pointer;
     transition: background 0.2s;
 
-    &:hover { background: var(--color-primary-hover); }
+    &:hover { background: var(--color-primary-solid-hover); }
   }
 
   &__all-link {

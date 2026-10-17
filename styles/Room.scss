@@ -108,9 +108,9 @@
   &:disabled { opacity: 0.4; cursor: not-allowed }
 
   &--primary {
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #fff;
-    &:hover:not(:disabled) { background: var(--color-primary-hover) }
+    &:hover:not(:disabled) { background: var(--color-primary-solid-hover) }
   }
 
   &--secondary {
@@ -241,7 +241,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: var(--color-primary-solid);
   color: #fff;
   display: flex;
   align-items: center;
@@ -328,7 +328,7 @@
 .room-question__timer-fill {
   height: 100%;
   border-radius: 3px;
-  background: var(--color-primary);
+  background: var(--color-primary-solid);
   transition: width 0.1s linear, background 0.3s;
 
   &--urgent { background: var(--color-fake) }

@@ -168,10 +168,10 @@
   border: none;
 
   &--primary {
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #fff;
 
-    &:hover { background: var(--color-primary-hover); }
+    &:hover { background: var(--color-primary-solid-hover); }
     &:active { transform: scale(0.98); }
   }
 

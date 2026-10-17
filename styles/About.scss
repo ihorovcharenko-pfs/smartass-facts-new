@@ -28,7 +28,7 @@
     display: inline-flex;
     align-items: center;
     gap: 9px;
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #fff;
     font-family: var(--font-inter), sans-serif;
     font-size: 0.875rem;
@@ -201,7 +201,7 @@
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--color-primary-solid);
     color: #fff;
     font-size: 0.8rem;
     font-weight: 600;
