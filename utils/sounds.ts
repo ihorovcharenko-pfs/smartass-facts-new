@@ -9,6 +9,12 @@ const getCtx = (): AudioContext => {
   return audioCtx
 }
 
+// Create the AudioContext ahead of the first answer (first-time creation can take
+// hundreds of ms and used to delay the first result screen).
+export const warmAudio = () => {
+  try { getCtx() } catch { /* unsupported */ }
+}
+
 const playTone = (
   frequency: number,
   type: OscillatorType,
@@ -17,6 +23,7 @@ const playTone = (
 ) => {
   try {
     const ctx = getCtx()
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {})
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
 

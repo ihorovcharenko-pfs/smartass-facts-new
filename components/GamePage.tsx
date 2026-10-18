@@ -12,7 +12,7 @@ import xWhiteIcon from '../assets/x_white.svg'
 import arrowRightWhiteIcon from '../assets/arrow_right_white.svg'
 import { decryptAnswer } from '../utils/decryption'
 import { addSkipIds, incrementPoolId, getSessionToken, getSoundEnabled, setSoundEnabled } from '../utils/localStorage'
-import { playCorrect, playWrong } from '../utils/sounds'
+import { playCorrect, playWrong, warmAudio } from '../utils/sounds'
 import '../styles/Game.scss'
 
 interface GamePageProps {
@@ -74,6 +74,13 @@ function GamePage({ facts, category, source = 'direct', onBack, onContinue, onPl
     setInputLocked(true)
     setTimeout(() => setInputLocked(false), INPUT_LOCK_MS)
   }
+
+  useEffect(() => { if (soundEnabled) warmAudio() }, [soundEnabled])
+
+  // Pre-decrypt every answer in the background so the first tap shows its result instantly.
+  useEffect(() => {
+    facts.forEach(f => { decryptAnswer(f.answer) })
+  }, [facts])
 
   // One game_start per mounted game (Play again remounts via a new route push).
   useEffect(() => {
@@ -220,15 +227,12 @@ function GamePage({ facts, category, source = 'direct', onBack, onContinue, onPl
       setIsCorrect(correct)
       setFactIsReal(correctAnswer) // true = real fact, false = fake fact
 
-      // Play sound
-      if (soundEnabled) {
-        if (correct) playCorrect()
-        else playWrong()
-      }
-
       setAnswers(prev => [...prev, { factId: currentFact.id, isCorrect: correct }])
 
       setShowResult(true)
+
+      // Sound after the result is queued to render, never before it
+      if (soundEnabled) setTimeout(() => (correct ? playCorrect() : playWrong()), 0)
     } catch (error) {
       console.error('Error checking answer:', error)
       setIsCorrect(false)

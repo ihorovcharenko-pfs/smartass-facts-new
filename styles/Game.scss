@@ -121,7 +121,7 @@
 
   &__step-counter {
     font-size: 1rem;
-    color: #333333;
+    color: var(--color-text-muted); // was #333 on the dark bg (1.5:1)
     font-weight: 400;
     flex-shrink: 0;
     min-width: 40px;
