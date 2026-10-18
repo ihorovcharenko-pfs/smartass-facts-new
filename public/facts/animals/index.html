@@ -30,13 +30,13 @@
     .animal-label  { font-size: 1rem; font-weight: 700; }
     .animal-count  { font-size: 0.8rem; }
     footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #1a1a2e;
-             font-size: 13px; color: #555; text-align: center; }
+             font-size: 13px; color: #9a9ab8; text-align: center; }
     footer a { color: #ff8f00; text-decoration: none; }
   
     .footer-links { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-bottom: 10px; }
     .footer-links a { color: #c978d6; text-decoration: none; font-size: 13px; }
     .footer-links a:hover { text-decoration: underline; }
-    .footer-copy { font-size: 12px; color: #444; }
+    .footer-copy { font-size: 12px; color: #9a9ab8; }
   
   /* ── SmartAss Facts site header ── */
   .saf-site-header {
@@ -108,7 +108,7 @@
     }
     .saf-nav-links a:hover { color: #f0f0f0; }
     .saf-play-btn {
-      background: #F06030 !important;
+      background: #C2410C !important;
       color: #fff !important;
       padding: 6px 16px !important;
       border-radius: 20px !important;
@@ -137,15 +137,16 @@
       margin-bottom: 12px;
     }
     .saf-footer-links a {
-      color: #666;
+      color: #9a9ab8;
       text-decoration: none;
       font-size: 13px;
     }
     .saf-footer-links a:hover { color: #F06030; }
     .saf-footer-copy {
       font-size: 12px;
-      color: #444;
+      color: #9a9ab8;
     }
+  .animal-card .animal-count { color: #c8c8dc !important; }
 </style>
 <script>/* GA4 (via GTM) + cookie consent — same IDs, storage key and consent-mode behaviour as the app */
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
@@ -159,7 +160,7 @@ window.addEventListener('load',function(){setTimeout(function(){(window.requestI
 document.addEventListener('submit',function(e){var f=e.target;if(f&&f.name==='mc-embedded-subscribe-form'&&saGranted()){gtag('event','newsletter_signup',{location:'footer',send_to:'G-MS3N10PT93'});}},true);function saGranted(){try{return localStorage.getItem('sa_consent')==='granted'}catch(x){return false}}
 function choose(v){try{localStorage.setItem('sa_consent',v);}catch(e){}gtag('consent','update',{analytics_storage:v,ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});go();var b=document.getElementById('sa-cookie-banner');if(b)b.remove();}
 function banner(){if(document.getElementById('sa-cookie-banner'))return;var st=document.createElement('style');st.textContent='#sa-cookie-banner{position:fixed;left:1rem;right:1rem;bottom:1rem;max-width:720px;margin:0 auto;z-index:1000;display:flex;align-items:center;gap:1rem;padding:.875rem 1.125rem;background:#1a1a2e;border:1px solid #2a2a3e;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif;color:#e8e8f0}#sa-cookie-banner p{flex:1;margin:0;font-size:.8125rem;line-height:1.45}#sa-cookie-banner a{color:#e8e8f0;text-decoration:underline}#sa-cookie-banner button{padding:.5rem 1.125rem;border-radius:10px;font-size:.8125rem;font-weight:600;font-family:inherit;cursor:pointer;border:1px solid #2a2a3e;background:transparent;color:#e8e8f0;margin-left:.5rem}#sa-cookie-banner button.sa-yes{background:#C2410C;border-color:#C2410C;color:#fff}@media(max-width:560px){#sa-cookie-banner{flex-direction:column;align-items:stretch}#sa-cookie-banner div{display:flex}#sa-cookie-banner button{flex:1;margin:0 .25rem}}';document.head.appendChild(st);var d=document.createElement('div');d.id='sa-cookie-banner';d.setAttribute('role','dialog');d.setAttribute('aria-label','Cookie consent');d.innerHTML='<p>We use cookies to understand how the site is used and to improve it. Analytics only runs if you accept. <a href="/cookies/">Cookie Policy</a></p><div><button type="button" class="sa-no">Decline</button><button type="button" class="sa-yes">Accept</button></div>';document.body.appendChild(d);d.querySelector('.sa-no').onclick=function(){choose('denied');};d.querySelector('.sa-yes').onclick=function(){choose('granted');};}
-document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=document.querySelector('footer');if(f){var a=document.createElement('a');a.href='#cookie-settings';a.textContent='Cookie settings';a.style.cssText='display:inline-block;margin:.5rem 0';a.onclick=function(e){e.preventDefault();banner();};f.appendChild(a);}});})();</script>
+document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=document.querySelector('footer');if(f){var a=document.createElement('a');a.href='#cookie-settings';a.textContent='Cookie settings';a.style.cssText='display:inline-block;margin:.5rem 0;color:#9a9ab8;font-size:.8125rem';a.onclick=function(e){e.preventDefault();banner();};f.appendChild(a);}});})();</script>
 </head>
 <body>
   <nav class="saf-topnav">
@@ -200,7 +201,7 @@ document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=d
     <a href="https://smartassfacts.com/facts/animals/cat/" class="animal-card" style="border-color:#ab47bc20">
       <span class="animal-emoji">🐱</span>
       <span class="animal-label">Cat</span>
-      <span class="animal-count" style="color:#ab47bc">53 facts</span>
+      <span class="animal-count" style="color: #c978d6">53 facts</span>
     </a>
     <a href="https://smartassfacts.com/facts/animals/dog/" class="animal-card" style="border-color:#42a5f520">
       <span class="animal-emoji">🐶</span>
@@ -339,7 +340,7 @@ document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=d
     <div style="margin-bottom:32px">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px">
         <h2 style="font-size:1rem;font-weight:800;color:#e0e0e0;margin:0">🔬 Myths Debunked</h2>
-        <a href="https://smartassfacts.com/facts/myths/" style="font-size:0.82rem;color:#e94560;text-decoration:none">All 30 myths →</a>
+        <a href="https://smartassfacts.com/facts/myths/" style="font-size:0.82rem;color: #ff6b84;text-decoration:none">All 30 myths →</a>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
       <a href="https://smartassfacts.com/facts/myths/goldfish-have-three-second-memories/" style="display:flex;gap:10px;align-items:flex-start;background:rgba(233,69,96,0.04);border:1px solid rgba(233,69,96,0.2);border-radius:10px;padding:14px;text-decoration:none;color:inherit;transition:border-color 0.15s">
@@ -394,7 +395,7 @@ document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=d
         <span style="color:#aaa;font-size:0.9rem;">SmartAss Facts has a free embeddable quiz widget and curriculum-aligned resources for teachers.</span>
       </p>
       <a href="https://smartassfacts.com/for-educators/" style="display:inline-block;margin-right:12px;padding:8px 16px;background:#ab47bc;color:#fff;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;">For Educators →</a>
-      <a href="https://smartassfacts.com/embed/quiz/" style="display:inline-block;padding:8px 16px;border:1px solid #ab47bc;color:#ab47bc;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;">Embed the Quiz</a>
+      <a href="https://smartassfacts.com/embed/quiz/" style="display:inline-block;padding:8px 16px;border:1px solid #ab47bc;color: #c978d6;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;">Embed the Quiz</a>
     </div>
     </div>
 

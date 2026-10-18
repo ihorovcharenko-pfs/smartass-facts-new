@@ -30,7 +30,7 @@
     }
     .container { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
     .breadcrumb { font-size: 13px; color: #888; margin-bottom: 24px; }
-    .breadcrumb a { color: #e94560; text-decoration: none; }
+    .breadcrumb a { color: #ff6b84; text-decoration: none; }
     .breadcrumb a:hover { text-decoration: underline; }
     .hero { margin-bottom: 36px; }
     .continent-badge {
@@ -62,12 +62,12 @@
       gap: 20px;
       flex-wrap: wrap;
       font-size: 13px;
-      color: #666;
+      color: #9a9ab8;
       margin-bottom: 32px;
     }
     .intro-para { color: #aaa; margin-bottom: 28px; font-size: .95rem; line-height: 1.7; }
     .meta-row span { color: #aaa; }
-    .meta-row strong { color: #e94560; }
+    .meta-row strong { color: #ff6b84; }
     .facts-grid {
       display: grid;
       gap: 20px;
@@ -92,13 +92,13 @@
     }
     .fact-sa {
       font-size: 0.88rem;
-      color: #e94560;
+      color: #ff6b84;
       font-style: italic;
       margin-bottom: 8px;
     }
     .fact-link {
       font-size: 0.82rem;
-      color: #e94560;
+      color: #ff6b84;
       text-decoration: none;
     }
     .fact-link:hover { text-decoration: underline; }
@@ -115,11 +115,11 @@
       margin-bottom: 10px;
     }
     .verdict-fact { background: rgba(46,213,115,.12); color: #2ed573; border: 1.5px solid #2ed573; }
-    .verdict-fake { background: rgba(233,69,96,.12);  color: #e94560; border: 1.5px solid #e94560; }
+    .verdict-fake { background: rgba(233,69,96,.12);  color: #ff6b84; border: 1.5px solid #e94560; }
     .empty-state {
       text-align: center;
       padding: 40px;
-      color: #666;
+      color: #9a9ab8;
       background: #1a1a2e;
       border-radius: 10px;
       margin-bottom: 40px;
@@ -142,20 +142,20 @@
     .related h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 14px; color: #fff; }
     .related-link {
       display: block;
-      color: #e94560;
+      color: #ff6b84;
       text-decoration: none;
       padding: 9px 0;
       border-bottom: 1px solid #1a1a2e;
       font-size: 0.9rem;
     }
     .related-link:hover { text-decoration: underline; }
-    .back-link { display:block; margin-bottom:32px; color:#e94560; text-decoration:none; font-size:.9rem; }
+    .back-link { display:block; margin-bottom:32px; color: #ff6b84; text-decoration:none; font-size:.9rem; }
     .back-link:hover { text-decoration:underline; }
   
     .footer-links { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-bottom: 10px; }
     .footer-links a { color: #c978d6; text-decoration: none; font-size: 13px; }
     .footer-links a:hover { text-decoration: underline; }
-    .footer-copy { font-size: 12px; color: #444; }
+    .footer-copy { font-size: 12px; color: #9a9ab8; }
   
   /* ── SmartAss Facts site header ── */
   .saf-site-header {
@@ -227,7 +227,7 @@
     }
     .saf-nav-links a:hover { color: #f0f0f0; }
     .saf-play-btn {
-      background: #F06030 !important;
+      background: #C2410C !important;
       color: #fff !important;
       padding: 6px 16px !important;
       border-radius: 20px !important;
@@ -256,14 +256,14 @@
       margin-bottom: 12px;
     }
     .saf-footer-links a {
-      color: #666;
+      color: #9a9ab8;
       text-decoration: none;
       font-size: 13px;
     }
     .saf-footer-links a:hover { color: #F06030; }
     .saf-footer-copy {
       font-size: 12px;
-      color: #444;
+      color: #9a9ab8;
     }
 
     /* ── SAF play bar ── */
@@ -310,7 +310,7 @@ window.addEventListener('load',function(){setTimeout(function(){(window.requestI
 document.addEventListener('submit',function(e){var f=e.target;if(f&&f.name==='mc-embedded-subscribe-form'&&saGranted()){gtag('event','newsletter_signup',{location:'footer',send_to:'G-MS3N10PT93'});}},true);function saGranted(){try{return localStorage.getItem('sa_consent')==='granted'}catch(x){return false}}
 function choose(v){try{localStorage.setItem('sa_consent',v);}catch(e){}gtag('consent','update',{analytics_storage:v,ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});go();var b=document.getElementById('sa-cookie-banner');if(b)b.remove();}
 function banner(){if(document.getElementById('sa-cookie-banner'))return;var st=document.createElement('style');st.textContent='#sa-cookie-banner{position:fixed;left:1rem;right:1rem;bottom:1rem;max-width:720px;margin:0 auto;z-index:1000;display:flex;align-items:center;gap:1rem;padding:.875rem 1.125rem;background:#1a1a2e;border:1px solid #2a2a3e;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif;color:#e8e8f0}#sa-cookie-banner p{flex:1;margin:0;font-size:.8125rem;line-height:1.45}#sa-cookie-banner a{color:#e8e8f0;text-decoration:underline}#sa-cookie-banner button{padding:.5rem 1.125rem;border-radius:10px;font-size:.8125rem;font-weight:600;font-family:inherit;cursor:pointer;border:1px solid #2a2a3e;background:transparent;color:#e8e8f0;margin-left:.5rem}#sa-cookie-banner button.sa-yes{background:#C2410C;border-color:#C2410C;color:#fff}@media(max-width:560px){#sa-cookie-banner{flex-direction:column;align-items:stretch}#sa-cookie-banner div{display:flex}#sa-cookie-banner button{flex:1;margin:0 .25rem}}';document.head.appendChild(st);var d=document.createElement('div');d.id='sa-cookie-banner';d.setAttribute('role','dialog');d.setAttribute('aria-label','Cookie consent');d.innerHTML='<p>We use cookies to understand how the site is used and to improve it. Analytics only runs if you accept. <a href="/cookies/">Cookie Policy</a></p><div><button type="button" class="sa-no">Decline</button><button type="button" class="sa-yes">Accept</button></div>';document.body.appendChild(d);d.querySelector('.sa-no').onclick=function(){choose('denied');};d.querySelector('.sa-yes').onclick=function(){choose('granted');};}
-document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=document.querySelector('footer');if(f){var a=document.createElement('a');a.href='#cookie-settings';a.textContent='Cookie settings';a.style.cssText='display:inline-block;margin:.5rem 0';a.onclick=function(e){e.preventDefault();banner();};f.appendChild(a);}});})();</script>
+document.addEventListener('DOMContentLoaded',function(){if(!saC)banner();var f=document.querySelector('footer');if(f){var a=document.createElement('a');a.href='#cookie-settings';a.textContent='Cookie settings';a.style.cssText='display:inline-block;margin:.5rem 0;color:#9a9ab8;font-size:.8125rem';a.onclick=function(e){e.preventDefault();banner();};f.appendChild(a);}});})();</script>
 </head>
 <body>
   <nav class="saf-topnav">
