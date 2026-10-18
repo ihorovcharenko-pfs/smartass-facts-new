@@ -12,11 +12,12 @@ function Header() {
   const { pathname, searchText, onSearchChange, navigate, onPlayClick } = useApp()
   const { user, logout, openAuthModal } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
-  const isMainPage = pathname === '/'
-  // Play Now depends on the route; render it only after mount so the server HTML
-  // and first client render always agree (was a React #418 hydration mismatch).
+  // Route-dependent parts (search box on home, Play Now elsewhere) render only after
+  // mount: on Vercel the server render of `/` does not see pathname '/', so anything
+  // route-dependent in the server HTML mismatched the client (React #418).
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
+  const isMainPage = mounted && pathname === '/'
 
   const navLinks = (
     <>
@@ -30,7 +31,7 @@ function Header() {
       ) : (
         <button className="header__signin" onClick={() => { openAuthModal('login'); setMenuOpen(false) }}>Sign in</button>
       )}
-      {mounted && !isMainPage && (
+      {mounted && pathname !== '/' && (
         <button className="header__play-now" onClick={() => { onPlayClick('Game of the day', 'header_play_now'); setMenuOpen(false) }}>▶ Play Now</button>
       )}
     </>
