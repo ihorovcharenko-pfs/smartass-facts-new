@@ -676,3 +676,6 @@
   width: 100%;
   margin-top: 0.25rem;
 }
+
+// No 300ms double-tap-zoom delay on Party Mode controls
+.room button { touch-action: manipulation; }

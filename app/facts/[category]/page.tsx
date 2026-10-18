@@ -18,9 +18,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return {
     // Lead with the searched keyword ("Music Facts"), not the branded
     // saCategory name ("Offbeat Brilliance") — that's what queries match.
-    title: copy
-      ? `${copy.plain} Facts — Surprising & Verified | SmartAss Facts`
-      : `${displayName} Facts | SmartAss Facts`,
+    title: `${copy?.plain ?? displayName} Trivia & Myths Debunked | SmartAss Facts`,
     description: copy?.description
       ?? `Surprising ${displayName} facts — can you tell which are real and which are fake?`,
     alternates: { canonical: `https://smartassfacts.com/facts/${category}/` },

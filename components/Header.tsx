@@ -31,7 +31,7 @@ function Header() {
         <button className="header__signin" onClick={() => { openAuthModal('login'); setMenuOpen(false) }}>Sign in</button>
       )}
       {mounted && !isMainPage && (
-        <button className="header__play-now" onClick={() => { onPlayClick('Game of the day'); setMenuOpen(false) }}>▶ Play Now</button>
+        <button className="header__play-now" onClick={() => { onPlayClick('Game of the day', 'header_play_now'); setMenuOpen(false) }}>▶ Play Now</button>
       )}
     </>
   )

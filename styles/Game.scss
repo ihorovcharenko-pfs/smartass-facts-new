@@ -1,4 +1,9 @@
 .game {
+  // No 300ms double-tap-zoom delay on any game control (iOS / webviews)
+  button { touch-action: manipulation; }
+
+  &__fact-buttons--locked { pointer-events: none; }
+
   // Positioning context for the absolutely-placed back/sound buttons; without it
   // they sit at the top of the page, underneath the sticky site header.
   position: relative;

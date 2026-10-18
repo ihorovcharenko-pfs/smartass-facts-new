@@ -197,14 +197,14 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
           ) : (
             <div className="categories-grid">
               {showForYouCard && (
-                <div className="category-card category-card--for-you" onClick={() => onPlayClick('For You')} style={{ cursor: 'pointer' }}>
+                <div className="category-card category-card--for-you" onClick={() => onPlayClick('For You', 'home_for_you')} style={{ cursor: 'pointer' }}>
                   <div className="category-card__image-wrapper">
                     <div className="category-card__for-you-bg">
                       <span className="category-card__for-you-emoji">🎯</span>
                     </div>
                     <div className="category-card__overlay">
                       <h3 className="category-card__title">For You</h3>
-                      <button className="category-card__play-button" aria-label="Play For You" onClick={e => { e.stopPropagation(); onPlayClick('For You') }}>
+                      <button className="category-card__play-button" aria-label="Play For You" onClick={e => { e.stopPropagation(); onPlayClick('For You', 'home_for_you') }}>
                         ▶ Play
                       </button>
                     </div>
@@ -223,7 +223,7 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                   <div
                     key={category.id}
                     className={`category-card ${isGameOfTheDay ? 'category-card--game-of-day' : ''} ${isFavourite ? 'category-card--favourite' : ''}`}
-                    onClick={() => onPlayClick(category.saCategory)}
+                    onClick={() => onPlayClick(category.saCategory, 'home_tile')}
                     style={{ cursor: 'pointer' }}
                   >
                     <div className="category-card__image-wrapper">
@@ -251,7 +251,7 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                       )}
                       <div className="category-card__overlay">
                         <h3 className="category-card__title">{category.saCategory}</h3>
-                        <button className="category-card__play-button" aria-label="Play" onClick={e => { e.stopPropagation(); onPlayClick(category.saCategory) }}>
+                        <button className="category-card__play-button" aria-label="Play" onClick={e => { e.stopPropagation(); onPlayClick(category.saCategory, 'home_tile') }}>
                           ▶ Play
                         </button>
                       </div>

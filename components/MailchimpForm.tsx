@@ -1,5 +1,6 @@
 'use client'
 
+import { track } from '../utils/analytics'
 import { useState } from 'react'
 import '../styles/MailchimpForm.scss'
 
@@ -10,6 +11,7 @@ function MailchimpForm() {
   const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = () => {
+    track('newsletter_signup', { location: 'footer' })
     // Form posts to Mailchimp in a new tab; we show a local success state
     setTimeout(() => setSubmitted(true), 200)
   }

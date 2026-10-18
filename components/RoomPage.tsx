@@ -162,7 +162,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     socket.on('room:created', ({ code, category, players }) => {
       isHostRef.current = true
       roomMeta.current = { category, players: players.length }
-      track('party_room_created', { category, mode: 'party' })
+      track('party_room_created', { category_name: category, mode: 'party' })
       setLoading(false)
       setErrorMsg('')
       setPhase({ tag: 'lobby', code, category, players, isHost: true })
@@ -249,7 +249,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
     socket.on('room:finished', ({ finalScores }: { finalScores: FinalScore[] }) => {
       // Host only, so each Party game is counted once, not once per player.
-      if (isHostRef.current) track('party_game_complete', { category: roomMeta.current.category, mode: 'party', players: finalScores.length, score: finalScores[0]?.score })
+      if (isHostRef.current) track('party_game_complete', { category_name: roomMeta.current.category, mode: 'party', players: finalScores.length, final_score: finalScores[0]?.score })
       setPhase({ tag: 'finished', finalScores })
     })
 
@@ -298,7 +298,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   }, [phase, joinName])
 
   const handleStart = useCallback(() => {
-    track('party_game_start', { category: roomMeta.current.category, mode: 'party', players: roomMeta.current.players })
+    track('party_game_start', { category_name: roomMeta.current.category, mode: 'party', players: roomMeta.current.players })
     socketRef.current.emit('room:start')
   }, [])
 

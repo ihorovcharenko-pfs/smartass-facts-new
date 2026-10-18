@@ -16,7 +16,7 @@ function ShareCard({ score, total, category }: ShareCardProps) {
   const shareText = `I scored ${score}/${total} on "${category}" — can you beat me? Play at https://smartassfacts.com 🧠`
 
   const handleShare = async () => {
-    track('share_click', { category, score, total, method: typeof navigator.share === 'function' ? 'native' : 'clipboard' })
+    track('share_click', { category_name: category, final_score: score, total, method: typeof navigator.share === 'function' ? 'native' : 'clipboard' })
     if (navigator.share) {
       try {
         await navigator.share({ text: shareText })

@@ -18,6 +18,8 @@ import '../styles/Game.scss'
 interface GamePageProps {
   facts: Fact[]
   category: string
+  /** Where the game was launched from (home_tile, header_play_now, replay, …) — analytics only */
+  source?: string
   onBack?: () => void
   onContinue?: () => void
   onPlayAgain?: (category: string) => void
@@ -30,7 +32,7 @@ interface AnswerResult {
   isCorrect: boolean
 }
 
-function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComplete }: GamePageProps) {
+function GamePage({ facts, category, source = 'direct', onBack, onContinue, onPlayAgain, onGameComplete }: GamePageProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = facts.length || 10
   const [isAnswered, setIsAnswered] = useState(false)
@@ -62,9 +64,20 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
   const gameMode: GameMode = onGameComplete ? 'battle' : isDaily ? 'daily' : 'single'
   const completedTrackedRef = useRef(false)
 
+  // Input lock: ~200ms after every answer / card change so a rapid double-tap can't
+  // register on the next card (answer → Next, or Next → next card's answer).
+  const INPUT_LOCK_MS = 200
+  const lockUntilRef = useRef(0)
+  const [inputLocked, setInputLocked] = useState(false)
+  const lockInput = () => {
+    lockUntilRef.current = Date.now() + INPUT_LOCK_MS
+    setInputLocked(true)
+    setTimeout(() => setInputLocked(false), INPUT_LOCK_MS)
+  }
+
   // One game_start per mounted game (Play again remounts via a new route push).
   useEffect(() => {
-    track('game_start', { category, mode: gameMode })
+    track('game_start', { category_name: category, source, mode: gameMode })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [currentStreak, setCurrentStreak] = useState<number | undefined>(undefined)
@@ -191,7 +204,8 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
   }
 
   const handleAnswer = async (userChoice: boolean) => {
-    if (isAnswered) return
+    if (isAnswered || Date.now() < lockUntilRef.current) return
+    lockInput()
 
     const currentFact = facts[currentStep - 1]
     if (!currentFact) return
@@ -202,6 +216,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
     try {
       const correctAnswer = await decryptAnswer(currentFact.answer)
       const correct = userChoice === correctAnswer
+      track('question_answered', { question_id: currentFact.id, is_correct: correct, category_name: category })
       setIsCorrect(correct)
       setFactIsReal(correctAnswer) // true = real fact, false = fake fact
 
@@ -223,6 +238,8 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
   }
 
   const handleNext = () => {
+    if (Date.now() < lockUntilRef.current) return
+    lockInput()
     setCurrentStep((prev) => {
       if (prev < totalSteps) {
         setIsAnswered(false)
@@ -265,7 +282,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
         const finalScore = answers.filter(a => a.isCorrect).length
         if (!completedTrackedRef.current) {
           completedTrackedRef.current = true
-          track('game_complete', { category, mode: gameMode, score: finalScore, total: totalSteps, percentage: Math.round((finalScore / totalSteps) * 100) })
+          track('game_complete', { category_name: category, final_score: finalScore, streak_count: currentStreak ?? 0, total: totalSteps, percentage: Math.round((finalScore / totalSteps) * 100), mode: gameMode })
         }
 
         // In battle mode the caller owns the results screen
@@ -295,7 +312,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
     setShowResult(false)
     setAnswers([])
     completedTrackedRef.current = false
-    track('game_replay', { category, mode: gameMode })
+    track('game_replay', { category_name: category, mode: gameMode })
     onPlayAgain?.(category)
   }
 
@@ -303,7 +320,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
   const handleChallengeFriend = async (): Promise<string> => {
     const factIds = facts.map(f => f.id)
     const result = await createBattle(category, factIds, correctCount)
-    track('challenge_created', { category, mode: gameMode, score: correctCount })
+    track('challenge_created', { category_name: category, mode: gameMode, final_score: correctCount })
     return `${window.location.origin}/battle/${result.id}`
   }
 
@@ -402,7 +419,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
               >
                 <h2 className="game__fact-question">Is this fact true?</h2>
                 <p className="game__fact-text">{currentFact.saFact}</p>
-                <div className="game__fact-buttons">
+                <div className={`game__fact-buttons ${inputLocked ? 'game__fact-buttons--locked' : ''}`}>
                   <button
                     className={`game__fact-button game__fact-button--fact ${isAnswered && userAnswer === true ? 'game__fact-button--selected' : ''} ${isAnswered ? 'game__fact-button--disabled' : ''}`}
                     onClick={() => handleAnswer(true)}
@@ -452,7 +469,7 @@ function GamePage({ facts, category, onBack, onContinue, onPlayAgain, onGameComp
                       ? "Great job on spotting the fake!"
                       : "It's not a real fact, it's just our fantasy. Now you know 🐒"}
                 </p>
-                <div className="game__fact-buttons">
+                <div className={`game__fact-buttons ${inputLocked ? 'game__fact-buttons--locked' : ''}`}>
                   <button
                     className="game__fact-button game__fact-button--next"
                     onClick={handleNext}

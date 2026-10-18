@@ -1,5 +1,6 @@
 'use client'
 
+import { track } from '../utils/analytics'
 import { useState } from 'react'
 import { subscribeEmail } from '../services/clientService'
 import '../styles/EmailCapture.scss'
@@ -19,6 +20,7 @@ function EmailCaptureForm({ context = 'first-game' }: EmailCaptureFormProps) {
     setStatus('loading')
     const result = await subscribeEmail(email.trim())
     if (result.success) {
+      track('newsletter_signup', { location: 'modal' })
       setStatus('success')
     } else {
       setStatus('error')

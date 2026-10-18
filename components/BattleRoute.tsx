@@ -41,7 +41,7 @@ function BattleRoute({ battleId, navigate }: BattleRouteProps) {
 
   const handlePlayAgain = useCallback(() => {
     if (!battle) return
-    navigate(GAME_PATH, buildGameSearch(battle.category))
+    navigate(GAME_PATH, buildGameSearch(battle.category, 'battle'))
   }, [battle, navigate])
 
   const handleGoHome = useCallback(() => navigate('/'), [navigate])

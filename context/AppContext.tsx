@@ -24,7 +24,7 @@ export interface AppContextValue {
   onSearchChange: (text: string) => void
   selectedGroupId: number | null
   onGroupSelect: (groupId: number | null) => void
-  onPlayClick: (category: string) => void
+  onPlayClick: (category: string, source?: string) => void
   favouriteCategories: number[]
 }
 
@@ -67,8 +67,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const onPlayClick = useCallback(
-    (category: string) => {
-      router.push(`/game?cat=${encodeURIComponent(category)}`)
+    (category: string, source = 'content_page') => {
+      router.push(`/game?cat=${encodeURIComponent(category)}&src=${encodeURIComponent(source)}`)
     },
     [router],
   )
