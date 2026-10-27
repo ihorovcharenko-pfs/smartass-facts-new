@@ -78,6 +78,9 @@ export default function Analytics() {
       mc.src = 'https://tracker.metricool.com/resources/be.js'
       mc.onload = () => w.beTracker?.t({ hash: '36cfdddb80fbd4334383452901c6b62e' })
       document.head.appendChild(mc)
+
+      // Metricool tracking pixel (same hash; equivalent of the <img> snippet)
+      new Image().src = 'https://tracker.metricool.com/c3po.jpg?hash=36cfdddb80fbd4334383452901c6b62e'
       }
       if (getConsent() === 'granted') loadTrackers()
     }
