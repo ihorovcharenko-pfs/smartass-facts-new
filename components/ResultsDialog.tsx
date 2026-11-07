@@ -9,6 +9,8 @@ import EmailCaptureForm from './EmailCaptureForm'
 import LeaderboardBanner from './LeaderboardBanner'
 import PushPrompt from './PushPrompt'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
+import { submitGameResult } from '../services/clientService'
 import { incrementGamesPlayed } from '../utils/localStorage'
 import { tierFor } from '../utils/tiers'
 import { track } from '../utils/analytics'
@@ -26,11 +28,25 @@ interface ResultsDialogProps {
   mode?: string
   onContinue: () => void
   onPlayAgain: () => void
+  /** Async "Challenge a friend" link (same 10 facts). Returns the battle URL. */
+  onChallengeFriend?: () => Promise<string>
 }
 
-function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStreak, isDaily = false, beat = null, mode = 'single', onContinue, onPlayAgain }: ResultsDialogProps) {
+function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStreak, isDaily = false, beat = null, mode = 'single', onContinue, onPlayAgain, onChallengeFriend }: ResultsDialogProps) {
   const { navigate } = useApp()
+  const { user, openAuthModal } = useAuth()
   const [shareOpen, setShareOpen] = useState(false)
+  const [challengeState, setChallengeState] = useState<'idle' | 'loading' | 'copied'>('idle')
+  const signedInAtMount = useRef(!!user)
+  const savedRef = useRef(false)
+
+  // Signed up / signed in right here on the summary → save THIS game to the leaderboard too
+  useEffect(() => {
+    if (user && !signedInAtMount.current && !savedRef.current) {
+      savedRef.current = true
+      submitGameResult(category, correctCount, totalCount, mode)
+    }
+  }, [user, category, correctCount, totalCount, mode])
   const tier = tierFor(correctCount, totalCount)
 
   // Count the finished game once per mount
@@ -50,6 +66,21 @@ function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStr
       : correctCount === beat.score ? `A tie with ${beat.name || 'your friend'}: ${correctCount} each.`
       : `${beat.name || 'Your friend'} wins this one: ${beat.score} vs ${correctCount}.`
     : null
+
+  const challengeLink = async () => {
+    if (!onChallengeFriend) return
+    setChallengeState('loading')
+    try {
+      const url = await onChallengeFriend()
+      const text = `I scored ${correctCount}/${totalCount} on "${category}". Can you beat me? ${url} 🧠`
+      if (navigator.share) await navigator.share({ text })
+      else await navigator.clipboard.writeText(url)
+      setChallengeState('copied')
+      setTimeout(() => setChallengeState('idle'), 3000)
+    } catch {
+      setChallengeState('idle')
+    }
+  }
 
   // "Challenge a friend 1-on-1" opens Party Mode with this category preselected
   const challenge = () => {
@@ -94,7 +125,22 @@ function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStr
           <Button variant="white" onClick={() => setShareOpen(true)}>Share score</Button>
           <Button variant="yellow" onClick={onPlayAgain}>Play again</Button>
         </div>
+        {onChallengeFriend && (
+          <Button variant="ghost" block disabled={challengeState === 'loading'} onClick={challengeLink}>
+            {challengeState === 'loading' ? '⏳ Creating challenge…' : challengeState === 'copied' ? '✓ Link copied!' : '⚔️ Challenge a friend'}
+          </Button>
+        )}
         <button type="button" className="cp-link" onClick={onContinue}>Pick another category</button>
+
+        {!user && (
+          <div className="cp-card cp-card--lime" role="region" aria-label="Join the leaderboard">
+            <strong style={{ display: 'block', fontSize: '1.125rem', fontWeight: 900 }}>
+              {isFirstGame ? 'Nice first game! Sign up now to join the leaderboard.' : 'Sign up to join the leaderboard.'}
+            </strong>
+            <p style={{ margin: '4px 0 12px', fontWeight: 600 }}>Free account. Your score from this game gets saved.</p>
+            <Button variant="yellow" block onClick={() => { track('signup_prompt_click', { category_name: category, first_game: isFirstGame }); openAuthModal('register') }}>Sign up and join the board</Button>
+          </div>
+        )}
 
         <PushPrompt />
         {(isFirstGame || isDaily) && <EmailCaptureForm context={isDaily ? 'daily' : 'first-game'} />}

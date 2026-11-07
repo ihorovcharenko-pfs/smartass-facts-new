@@ -10,7 +10,7 @@ import Card from './comic/Card'
 import Meter from './comic/Meter'
 import CategorySticker from './comic/CategorySticker'
 import MascotBubble from './comic/MascotBubble'
-import { type Fact, playStreak, fetchStreak, logInteractions, submitGameResult } from '../services/clientService'
+import { type Fact, playStreak, fetchStreak, logInteractions, submitGameResult, createBattle } from '../services/clientService'
 import { decryptAnswer } from '../utils/decryption'
 import { bestStreak } from '../utils/tiers'
 import { addSkipIds, incrementPoolId, getSessionToken, getSoundEnabled, setSoundEnabled } from '../utils/localStorage'
@@ -180,6 +180,13 @@ function GamePage({ facts, category, source = 'direct', beat = null, onBack, onC
     }
   }
 
+  // "Challenge a friend": async link — the friend plays the SAME 10 facts and tries to beat this score
+  const handleChallengeFriend = async (): Promise<string> => {
+    const result = await createBattle(category, facts.map(f => f.id), correctCount)
+    track('challenge_created', { category_name: category, category, mode: gameMode, final_score: correctCount })
+    return `${window.location.origin}/battle/${result.id}`
+  }
+
   const handleContinue = () => { setShowResultsDialog(false); onContinue?.() }
 
   const handlePlayAgainClick = () => {
@@ -214,6 +221,7 @@ function GamePage({ facts, category, source = 'direct', beat = null, onBack, onC
           mode={gameMode}
           onContinue={handleContinue}
           onPlayAgain={handlePlayAgainClick}
+          onChallengeFriend={handleChallengeFriend}
         />
         {showPassModal && (
           <SmartassPassModal

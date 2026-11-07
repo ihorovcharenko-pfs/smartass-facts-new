@@ -115,6 +115,8 @@ function Countdown({ endsAt, total }: { endsAt: number; total: number }) {
 
 // ─── Helper ────────────────────────────────────────────────────────────────────
 
+const fmt = (n: number) => n.toLocaleString('en-US')
+
 function initials(name: string) {
   return name.slice(0, 2).toUpperCase()
 }
@@ -505,12 +507,12 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
           <div style={{ display: 'flex', gap: 8, flex: 1, minWidth: 0 }}>
             <div className="cp-score-card cp-score-card--active">
               <div style={{ minWidth: 0 }}><small>{answered ? 'Locked in' : 'Your turn'}</small><b>{me?.name ?? 'You'}</b></div>
-              <strong>{me?.score ?? 0}</strong>
+              <strong>{fmt(me?.score ?? 0)}</strong>
             </div>
             {others[0] && (
               <div className="cp-score-card">
                 <div style={{ minWidth: 0 }}><small>{others.length > 1 ? `+${others.length - 1} more` : 'Waiting'}</small><b>{others[0].name}</b></div>
-                <strong>{others[0].score}</strong>
+                <strong>{fmt(others[0].score)}</strong>
               </div>
             )}
           </div>
@@ -554,7 +556,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       <Shell toast={toastNode}>
         <div className="cp-topbar">
           <Button variant="yellow" size="round" aria-label="Leave game and go home" onClick={goHome}>✕</Button>
-          <span className={`cp-chip${nailed ? ' cp-chip--lime' : ' cp-chip--dim'}`}>{me?.score ?? mine?.totalScore ?? 0} pts</span>
+          <span className={`cp-chip${nailed ? ' cp-chip--lime' : ' cp-chip--dim'}`}>{fmt(me?.score ?? mine?.totalScore ?? 0)} pts</span>
         </div>
         <Meter isFact={correctAnswer} />
         <div>
@@ -582,7 +584,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
               <span className="cp-rank-row__rank">{i + 1}</span>
               <span className="cp-rank-row__name">{r.playerName}{r.socketId === myId ? ' (you)' : ''}</span>
               <span aria-label={r.answer === null ? 'no answer' : r.correct ? 'correct' : 'wrong'}>{r.answer === null ? '–' : r.correct ? '✓' : '✗'}</span>
-              <span className="cp-rank-row__pts">{r.totalScore}</span>
+              <span className="cp-rank-row__pts">{fmt(r.totalScore)}</span>
             </li>
           ))}
         </ol>
@@ -631,7 +633,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
           {finalScores.slice(0, 6).map(p => (
             <div key={p.socketId} className={`cp-score-card${winners.includes(p) ? ' cp-score-card--winner' : ''}`} style={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: 140 }}>
               <b>{p.name}{p.socketId === myId ? ' (you)' : ''}</b>
-              <strong style={{ fontSize: '2.4rem' }}>{p.score}</strong>
+              <strong style={{ fontSize: '2.4rem' }}>{fmt(p.score)}</strong>
               <small>{winners.includes(p) ? (tie ? 'Tied' : 'Winner') : 'So close'}</small>
             </div>
           ))}

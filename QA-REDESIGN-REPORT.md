@@ -20,27 +20,30 @@ Mobile = 390px touch emulation, Desktop = 1440px. Chromium only; no physical iPh
 | Question | Mobile 390: no horizontal scroll, footer hidden | Pass | n/a |
 | Question | axe WCAG A/AA: no violations | Pass | Pass |
 | Question | Rapid double-tap answers once | Pass | Pass |
-| Reveal | Correct: needle points to the TRUE answer (FACT → right) | Pass | Pass |
-| Reveal | Correct: headline + colour | Pass | Pass |
-| Reveal | Correct: subline format | Pass | Pass |
-| Reveal | Correct: streak chip lime | Pass | Pass |
-| Reveal | Real fact shows its explanation | Pass | Pass |
-| Reveal | BS-o-meter: FAKE half orange (left), FACT half yellow (right) | Pass | Pass |
-| Reveal | Needle animates ~600ms ease-out with overshoot | Pass | Pass |
-| Reveal | No "Tell me more" step; NEXT FACT button | Pass | Pass |
-| Reveal | axe WCAG A/AA: no violations | Pass | Pass |
 | Reveal | Wrong: needle points to the TRUE answer (FAKE → left) | Pass | Pass |
 | Reveal | Wrong: headline + colour | Pass | Pass |
 | Reveal | Wrong: subline format | Pass | Pass |
 | Reveal | Wrong: streak chip dimmed | Pass | Pass |
 | Reveal | Fake fact: struck-through statement + fantasy line | Pass | Pass |
+| Reveal | BS-o-meter: FAKE half orange (left), FACT half yellow (right) | Pass | Pass |
+| Reveal | Needle animates ~600ms ease-out with overshoot | Pass | Pass |
+| Reveal | No "Tell me more" step; NEXT FACT button | Pass | Pass |
+| Reveal | Correct: needle points to the TRUE answer (FACT → right) | Pass | Pass |
+| Reveal | Correct: headline + colour | Pass | Pass |
+| Reveal | Correct: subline format | Pass | Pass |
+| Reveal | Correct: streak chip lime | Pass | Pass |
+| Reveal | Real fact shows its explanation | Pass | Pass |
+| Reveal | axe WCAG A/AA: no violations | Pass | Pass |
 | Reveal | Shows instantly after answering (<400ms) | Pass | Pass |
 | Reveal | prefers-reduced-motion: no animation, final needle shown | Pass | Pass |
-| Summary | Score badge "8/10 FACTS SPOTTED" | Pass | n/a |
-| Summary | Verdict title for 8/10 = "Dangerously Smart" | Pass | n/a |
+| Summary | Score badge "3/10 FACTS SPOTTED" | Pass | n/a |
+| Summary | Verdict title for 3/10 = "Professionally Fooled" | Pass | n/a |
 | Summary | Stat chips Correct / Fooled you / Best streak | Pass | Pass |
 | Summary | Best streak value is correct | Pass | Pass |
 | Summary | Buttons: Challenge 1-on-1, Share score, Play again, Pick another category | Pass | Pass |
+| Summary | Old "Challenge a friend" link button is kept (next to 1-on-1) | Pass | Pass |
+| Summary | Logged-out first game: "Sign up now to join the leaderboard" prompt (lime card) | Pass | Pass |
+| Summary | Old challenge creates a /battle/ link and shares/copies it | Pass | Pass |
 | Summary | axe WCAG A/AA: no violations | Pass | Pass |
 | Share sheet | Titled "Brag about it", 9:16 preview of the story card | Pass | Pass |
 | Share sheet | Buttons: Instagram, TikTok, X, WhatsApp, Copy link + Save image | Pass | Pass |
@@ -64,6 +67,7 @@ Mobile = 390px touch emulation, Desktop = 1440px. Chromium only; no physical iPh
 | GA4 | game_complete (score, category, mode) | Pass | Pass |
 | GA4 | share (platform) for instagram, tiktok, x, whatsapp, copy, save | Pass | Pass |
 | GA4 | caption_copied (platform) for instagram + tiktok | Pass | Pass |
+| GA4 | challenge_created (old challenge link) | Pass | Pass |
 | GA4 | challenge_click | Pass | Pass |
 | Share sheet | 320×568: stays inside the screen, scrolls inside, Save image reachable, no sideways overflow | Pass | Pass |
 | Summary | 320px: no horizontal overflow | Pass | Pass |
@@ -75,9 +79,13 @@ Mobile = 390px touch emulation, Desktop = 1440px. Chromium only; no physical iPh
 | GA4 | challenge_link_opened (code, category) | Pass | Pass |
 | GA4 | game_complete mode=beat | Pass | Pass |
 | Beat link | Unknown code → friendly "LINK EXPIRED" + Play now | Pass | Pass |
+| Sign-up prompt | Logged-out player: no leaderboard post yet | Pass | Pass |
+| Sign-up prompt | Button opens the sign-up (register) form | Pass | Pass |
+| Sign-up prompt | After signing up on the summary, THIS game is saved to the leaderboard | Pass | Pass |
+| Sign-up prompt | Prompt disappears once signed in | Pass | Pass |
 | Leaderboard | Header visible + "Hall of SmartAsses" + back button | Pass | Pass |
 | Leaderboard | Tabs Today / This week / All time (This week default) | Pass | Pass |
-| Leaderboard | Category filter dropdown | Pass | Pass |
+| Leaderboard | Category filter dropdown | FAIL | Pass |
 | Leaderboard | Podium: #2 left (white), #1 middle (yellow), #3 right (orange) | Pass | Pass |
 | Leaderboard | Rows for rank 4+ | Pass | Pass |
 | Leaderboard | Own rank pinned at the bottom in lime | Pass | Pass |
@@ -101,6 +109,7 @@ Mobile = 390px touch emulation, Desktop = 1440px. Chromium only; no physical iPh
 | Party game over | Share result opens the same custom share sheet | Pass | Pass |
 | Party rematch | Same category: both players land in the same room lobby | Pass | Pass |
 | Party rematch | Rematch game starts at round 1 | Pass | Pass |
+| Party game over | Scores formatted like the leaderboard (thousands separator) | Pass | Pass |
 | Party game over | Different answers → single winner headline "[NAME] WINS!" | Pass | Pass |
 | Party rematch | New category: both stay in, lobby shows the new category | Pass | Pass |
 | GA4 | rematch (same_category true / false) | Pass | Pass |
@@ -111,30 +120,3 @@ Mobile = 390px touch emulation, Desktop = 1440px. Chromium only; no physical iPh
 | Summary | Verdict title for 6/10 = "Suspiciously Average" | n/a | Pass |
 | Share: Instagram | Desktop fallback: image is downloaded | n/a | Pass |
 | Share: Save image | Desktop: PNG downloaded | n/a | Pass |
-
-## By screen
-
-| Screen | Passed |
-|---|---|
-| Question | 17/17 |
-| Reveal | 16/16 |
-| Summary | 10/10 |
-| Share sheet | 7/7 |
-| Share: Instagram | 5/5 |
-| Share: TikTok | 1/1 |
-| Share: X | 1/1 |
-| Share: WhatsApp | 1/1 |
-| Share: Copy link | 1/1 |
-| Share: Save image | 2/2 |
-| Share: Story card | 1/1 |
-| GA4 | 10/10 |
-| Beat link | 6/6 |
-| Leaderboard | 10/10 |
-| Party create | 2/2 |
-| Party lobby | 1/1 |
-| Party join | 1/1 |
-| Party question | 3/3 |
-| Party reveal | 1/1 |
-| Party game over | 7/7 |
-| Party rematch | 3/3 |
-| Party | 1/1 |
