@@ -430,6 +430,14 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
   // ── Actions ─────────────────────────────────────────────────────────────────
 
+  // Game actions must not be queued while the phone is reconnecting: socket.io would send them the
+  // instant the connection returns, BEFORE we reclaim our seat, and the server would ignore them.
+  const connectedOrWarn = useCallback(() => {
+    if (socketRef.current?.connected) return true
+    toast('Reconnecting… try again in a moment')
+    return false
+  }, [toast])
+
   const handleCreate = useCallback(() => {
     if (!hostName.trim()) { setErrorMsg('Enter your name first'); return }
     if (!selectedCategory) { setErrorMsg('Pick a category'); return }
@@ -447,21 +455,24 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   }, [phase, joinName])
 
   const handleStart = useCallback(() => {
+    if (!connectedOrWarn()) return
     track('party_game_start', { category_name: roomMeta.current.category, mode: 'party', players: roomMeta.current.players })
     socketRef.current.emit('room:start')
-  }, [])
+  }, [connectedOrWarn])
 
   const handleAnswer = useCallback((answer: boolean) => {
+    if (!connectedOrWarn()) return
     setPhase(prev => {
       if (prev.tag !== 'question' || prev.answered) return prev
       socketRef.current.emit('room:answer', { answer })
       return { ...prev, answered: true, userAnswer: answer }
     })
-  }, [])
+  }, [connectedOrWarn])
 
   const handleNext = useCallback(() => {
+    if (!connectedOrWarn()) return
     socketRef.current.emit('room:next')
-  }, [])
+  }, [connectedOrWarn])
 
   const handleShare = useCallback(async (code: string) => {
     const url = `${window.location.origin}/room/${code}`
@@ -691,6 +702,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       : finalScores.length === 2 ? `${finalScores[1].name} demands a rematch. Obviously.`
       : 'The room has spoken. The monkey approves.'
     const rematch = (newCategory: boolean) => {
+      if (!connectedOrWarn()) return
       track('rematch', { same_category: !newCategory, mode: 'party', category_name: category })
       socketRef.current.emit('room:rematch', newCategory ? { category: rematchCat || undefined } : {})
     }
