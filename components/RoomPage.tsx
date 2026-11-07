@@ -117,6 +117,26 @@ function Countdown({ endsAt, total }: { endsAt: number; total: number }) {
 
 const fmt = (n: number) => n.toLocaleString('en-US')
 
+// A private seat key lets a phone reclaim its place after the connection drops (switching apps,
+// locking the screen, a page reload). Per tab, never shown to other players.
+const SESSION_KEY = 'sa_room_session'
+function getPlayerKey(): string {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY)
+    const cur = raw ? JSON.parse(raw) : null
+    if (cur?.key) return cur.key
+    const key = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ key, code: null }))
+    return key
+  } catch { return `k-${Math.random().toString(36).slice(2)}` }
+}
+function saveRoomCode(code: string | null) {
+  try { const cur = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}'); sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...cur, code })) } catch { /* private mode */ }
+}
+function readSession(): { key?: string; code?: string | null } {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}') } catch { return {} }
+}
+
 function initials(name: string) {
   return name.slice(0, 2).toUpperCase()
 }
@@ -145,8 +165,15 @@ function RoundTimer({ endsAt, total, round, rounds }: { endsAt: number; total: n
 }
 
 // Module-level (a component defined inside RoomPage would remount every render and steal input focus)
-function Shell({ children, toast }: { children: React.ReactNode; toast: React.ReactNode }) {
-  return <div className="cp-screen"><div className="cp-col">{children}{toast}</div></div>
+function Shell({ children, toast, lost }: { children: React.ReactNode; toast: React.ReactNode; lost?: boolean }) {
+  return (
+    <div className="cp-screen">
+      <div className="cp-col">
+        {lost && <div className="cp-card cp-card--navy" role="status" style={{ borderColor: 'var(--cp-orange)', textAlign: 'center', fontWeight: 800, padding: '8px 12px' }}>Connection lost. Reconnecting…</div>}
+        {children}{toast}
+      </div>
+    </div>
+  )
 }
 
 function Crown() {
@@ -184,6 +211,9 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   const myCorrectRef = useRef(0)
   const [shareOpen, setShareOpen] = useState(false)
   const [pickingCat, setPickingCat] = useState(false)
+  const [connLost, setConnLost] = useState(false)
+  const roomCodeRef = useRef<string | null>(null)
+  const everConnected = useRef(false)
   const [rematchCat, setRematchCat] = useState('')
   const { toast, node: toastNode } = useToast()
   const roomMeta = useRef({ category: '', players: 1 })
@@ -208,12 +238,26 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     socketRef.current = socket
     mySocketId.current = socket.id ?? ''
 
+    // (Re)connected: if this phone already has a seat in a room (or is reloading on /room/CODE with a
+    // saved seat), ask the server to give it back.
+    const tryRejoin = () => {
+      const sess = readSession()
+      const code = roomCodeRef.current ?? (initialCode && sess.code === initialCode ? initialCode : null)
+      if (code && sess.key) socket.emit('room:rejoin', { code, playerKey: sess.key })
+    }
     socket.on('connect', () => {
       mySocketId.current = socket.id ?? ''
+      if (everConnected.current || initialCode) tryRejoin()
+      everConnected.current = true
     })
+    socket.on('disconnect', () => { if (roomCodeRef.current) setConnLost(true) })
+    if (socket.connected) { everConnected.current = true; if (initialCode) tryRejoin() }
+    const onVisible = () => { if (document.visibilityState === 'visible' && !socket.connected) socket.connect() }
+    document.addEventListener('visibilitychange', onVisible)
 
     socket.on('room:created', ({ code, category, players }) => {
       isHostRef.current = true
+      roomCodeRef.current = code; saveRoomCode(code)
       setBoard(players)
       roomMeta.current = { category, players: players.length }
       track('party_room_created', { category_name: category, mode: 'party' })
@@ -228,6 +272,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
     socket.on('room:joined', ({ code, category, players, hostSocketId }) => {
       roomMeta.current = { category, players: players.length }
+      roomCodeRef.current = code; saveRoomCode(code)
       setBoard(players)
       setLoading(false)
       setErrorMsg('')
@@ -323,6 +368,34 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       setPhase({ tag: 'lobby', code, category, players, isHost: socket.id === hostSocketId })
     })
 
+    // Reclaimed our seat after a drop: put the screen back where the game is
+    socket.on('room:rejoined', (r: { code: string; category: string; status: string; players: PlayerInfo[]; hostSocketId: string; question: QuestionData | null; answered: boolean; answeredCount: number; reveal: RevealData | null; finalScores: FinalScore[] | null }) => {
+      roomCodeRef.current = r.code; saveRoomCode(r.code)
+      mySocketId.current = socket.id ?? ''
+      isHostRef.current = socket.id === r.hostSocketId
+      roomMeta.current = { category: r.category, players: r.players.length }
+      setBoard(r.players); setConnLost(false); setErrorMsg(''); setLoading(false)
+      const isHost = socket.id === r.hostSocketId
+      if (r.status === 'question' && r.question) {
+        lastFactRef.current = r.question.saFact
+        setPhase({ tag: 'question', code: r.code, category: r.category, isHost, answered: r.answered, userAnswer: null, answeredCount: r.answeredCount, playerCount: r.players.length, data: r.question })
+      } else if (r.status === 'reveal' && r.reveal) {
+        setPhase({ tag: 'reveal', code: r.code, category: r.category, isHost, data: r.reveal })
+      } else if (r.status === 'finished' && r.finalScores) {
+        setPhase({ tag: 'finished', finalScores: r.finalScores })
+      } else {
+        setPhase({ tag: 'lobby', code: r.code, category: r.category, players: r.players, isHost })
+      }
+    })
+    socket.on('room:rejoin_failed', () => {
+      // Only matters if we thought we were in a room; on a fresh /room/CODE link the join form just stays
+      if (roomCodeRef.current) { roomCodeRef.current = null; saveRoomCode(null); setConnLost(false); setPhase({ tag: 'error', message: 'The room has closed. Start a new one from Party Mode.' }) }
+    })
+    socket.on('room:player_rekeyed', ({ oldSocketId, newSocketId }: { oldSocketId: string; newSocketId: string }) => {
+      setBoard(prev => prev.map(p => p.socketId === oldSocketId ? { ...p, socketId: newSocketId } : p))
+      setPhase(prev => prev.tag === 'lobby' ? { ...prev, players: prev.players.map(p => p.socketId === oldSocketId ? { ...p, socketId: newSocketId } : p) } : prev)
+    })
+
     socket.on('room:host_left', () => {
       setPhase({ tag: 'error', message: 'The host left — the room has closed.' })
     })
@@ -344,6 +417,11 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       socket.off('room:reveal')
       socket.off('room:finished')
       socket.off('room:rematch')
+      socket.off('room:rejoined')
+      socket.off('room:rejoin_failed')
+      socket.off('room:player_rekeyed')
+      socket.off('disconnect')
+      document.removeEventListener('visibilitychange', onVisible)
       socket.off('room:host_left')
       socket.off('room:error')
       disconnectRoomSocket()
@@ -357,7 +435,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     if (!selectedCategory) { setErrorMsg('Pick a category'); return }
     setErrorMsg('')
     setLoading(true)
-    socketRef.current.emit('room:create', { category: selectedCategory, hostName: hostName.trim() })
+    socketRef.current.emit('room:create', { category: selectedCategory, hostName: hostName.trim(), playerKey: getPlayerKey() })
   }, [hostName, selectedCategory])
 
   const handleJoin = useCallback(() => {
@@ -365,7 +443,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     if (!joinName.trim()) { setErrorMsg('Enter your name'); return }
     setErrorMsg('')
     setLoading(true)
-    socketRef.current.emit('room:join', { code: phase.code, playerName: joinName.trim() })
+    socketRef.current.emit('room:join', { code: phase.code, playerName: joinName.trim(), playerKey: getPlayerKey() })
   }, [phase, joinName])
 
   const handleStart = useCallback(() => {
@@ -408,7 +486,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   // ═══ CREATE ════════════════════════════════════════════════════════════════
   if (phase.tag === 'create') {
     return (
-      <Shell toast={toastNode}>
+      <Shell toast={toastNode} lost={connLost}>
         <div className="cp-topbar" style={{ justifyContent: 'flex-start' }}>
           <Button variant="yellow" size="round" aria-label="Back to home" onClick={goHome}>←</Button>
         </div>
@@ -438,7 +516,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   // ═══ JOIN (arrived via /room/CODE) ═════════════════════════════════════════
   if (phase.tag === 'joining') {
     return (
-      <Shell toast={toastNode}>
+      <Shell toast={toastNode} lost={connLost}>
         <h1 className="cp-h1 cp-h1--yellow">YOU&apos;RE INVITED!</h1>
         <p className="cp-sub">Enter your name to join the room.</p>
         <Card tilt="l" style={{ textAlign: 'center', fontSize: '2.4rem', fontWeight: 900, letterSpacing: '0.2em' }} aria-label={`Room code ${phase.code}`}>{phase.code}</Card>
@@ -458,7 +536,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   if (phase.tag === 'lobby') {
     const { code, category, players, isHost } = phase
     return (
-      <Shell toast={toastNode}>
+      <Shell toast={toastNode} lost={connLost}>
         <div className="cp-cat-row">
           <CategorySticker category={category} />
           <div className="cp-cat-meta">
@@ -501,7 +579,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     const { data, answered, userAnswer, answeredCount, playerCount, category } = phase
     const peek = others.length === 1 ? `NO PEEKING AT ${others[0].name.toUpperCase()}\u2019S PHONE.` : 'EVERYONE ANSWERS AT ONCE. NO PEEKING.'
     return (
-      <Shell toast={toastNode}>
+      <Shell toast={toastNode} lost={connLost}>
         <div className="cp-topbar">
           <Button variant="yellow" size="round" aria-label="Leave game and go home" onClick={goHome}>✕</Button>
           <div style={{ display: 'flex', gap: 8, flex: 1, minWidth: 0 }}>
@@ -553,7 +631,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       : nailed ? `It\u2019s ${truth}. +${mine!.pointsEarned} points`
       : `You said ${mine?.answer ? 'FACT' : 'FAKE'}. It\u2019s ${truth}.`
     return (
-      <Shell toast={toastNode}>
+      <Shell toast={toastNode} lost={connLost}>
         <div className="cp-topbar">
           <Button variant="yellow" size="round" aria-label="Leave game and go home" onClick={goHome}>✕</Button>
           <span className={`cp-chip${nailed ? ' cp-chip--lime' : ' cp-chip--dim'}`}>{fmt(me?.score ?? mine?.totalScore ?? 0)} pts</span>
@@ -618,7 +696,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     }
 
     return (
-      <Shell toast={toastNode}>
+      <Shell toast={toastNode} lost={connLost}>
         <span className="cp-label" style={{ textAlign: 'center' }}>Game over: {category}</span>
         <div className="cp-crown">
           <Crown />
@@ -682,7 +760,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
   // ═══ ERROR ═════════════════════════════════════════════════════════════════
   return (
-    <Shell toast={toastNode}>
+    <Shell toast={toastNode} lost={connLost}>
       <h1 className="cp-h1 cp-h1--orange">OOPS</h1>
       <p className="cp-sub" role="alert">{phase.tag === 'error' ? phase.message : 'Something went wrong.'}</p>
       <div className="cp-spacer" />
