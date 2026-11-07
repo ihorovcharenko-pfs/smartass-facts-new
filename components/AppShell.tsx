@@ -14,7 +14,9 @@ import { useAuth } from '../context/AuthContext'
 import { getOnboardingData, setOnboardingData } from '../utils/localStorage'
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() || '/'
+  const rawPath = usePathname() || '/'
+  // trailingSlash:true makes this '/game/' — normalise or the game/room checks never match
+  const pathname = rawPath.length > 1 && rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath
   const { openAuthModal } = useAuth()
   const [showOnboarding, setShowOnboarding] = useState(false)
 

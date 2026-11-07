@@ -51,6 +51,7 @@
       font-size: 0.9375rem;
       color: var(--color-text);
       font-family: var(--font-inter), sans-serif;
+      padding: 0.25rem 0;
       &::placeholder { color: var(--color-text-muted); }
     }
 
@@ -74,6 +75,7 @@
     font-weight: 500;
     transition: color 0.2s;
     white-space: nowrap;
+    padding: 0.5rem 0.25rem; // ≥36px tall hit area
     &:hover { color: var(--color-text); }
   }
 

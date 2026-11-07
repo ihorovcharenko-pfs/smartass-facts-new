@@ -17,6 +17,11 @@ export default function CookieBanner() {
     return () => window.removeEventListener(OPEN_BANNER_EVENT, reopen)
   }, [])
 
+  useEffect(() => {
+    document.body.classList.toggle('has-cookie-banner', open)
+    return () => document.body.classList.remove('has-cookie-banner')
+  }, [open])
+
   if (!open) return null
   const choose = (v: 'granted' | 'denied') => { setConsent(v); setOpen(false) }
 

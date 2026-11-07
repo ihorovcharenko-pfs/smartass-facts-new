@@ -29,6 +29,7 @@
 
   &__btn {
     padding: 0.5rem 1.125rem;
+    min-height: 44px;
     border-radius: 10px;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -46,3 +47,6 @@
     &__buttons { justify-content: stretch; > * { flex: 1; } }
   }
 }
+
+// While the banner is open, leave room under the page so it can't cover the last controls
+body.has-cookie-banner { padding-bottom: 170px; }

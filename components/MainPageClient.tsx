@@ -205,7 +205,7 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                     <div className="category-card__overlay">
                       <h3 className="category-card__title">For You</h3>
                       <button className="category-card__play-button" aria-label="Play For You" onClick={e => { e.stopPropagation(); onPlayClick('For You', 'home_for_you') }}>
-                        ▶ Play
+                        ▶︎<span className="category-card__play-label"> Play</span>
                       </button>
                     </div>
                   </div>
@@ -252,7 +252,7 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                       <div className="category-card__overlay">
                         <h3 className="category-card__title">{category.saCategory}</h3>
                         <button className="category-card__play-button" aria-label="Play" onClick={e => { e.stopPropagation(); onPlayClick(category.saCategory, 'home_tile') }}>
-                          ▶ Play
+                          ▶︎<span className="category-card__play-label"> Play</span>
                         </button>
                       </div>
                     </div>

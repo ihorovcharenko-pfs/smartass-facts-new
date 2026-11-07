@@ -125,6 +125,14 @@ function GamePage({ facts, category, source = 'direct', onBack, onContinue, onPl
     }
   }, [])
 
+  // The game board locks body scroll on phones; the end screen is taller than the
+  // screen and must scroll or Continue / Play again are unreachable on small phones.
+  useEffect(() => {
+    if (!isSmallScreen) return
+    if (showResultsDialog) document.body.classList.remove('no-scroll')
+    else document.body.classList.add('no-scroll')
+  }, [showResultsDialog, isSmallScreen])
+
   const SWIPE_THRESHOLD = 80
 
   const handleSwipeStart = (clientX: number) => {
