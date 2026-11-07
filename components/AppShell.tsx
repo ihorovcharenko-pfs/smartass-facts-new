@@ -12,6 +12,7 @@ import OnboardingModal from './OnboardingModal'
 import CookieBanner from './CookieBanner'
 import { useAuth } from '../context/AuthContext'
 import { getOnboardingData, setOnboardingData } from '../utils/localStorage'
+import '../styles/comic.scss'
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const rawPath = usePathname() || '/'
@@ -49,7 +50,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app">
       <Header />
       {children}
+      {/* Immersive routes hide the footer on phones; /game and /room show it on desktop (≥700px) */}
       {!isGameRoute && <Footer />}
+      {isGameRoute && (pathname === '/game' || pathname.startsWith('/room')) && (
+        <div className="footer-desktop-only"><Footer /></div>
+      )}
       {showOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <AuthModal />
       <CookieBanner />

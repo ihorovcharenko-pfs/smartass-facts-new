@@ -251,6 +251,68 @@ export const submitLeaderboardScore = async (
   return res.json()
 }
 
+// ─── Period leaderboard (Today / This week / All time) ──────────────────────
+
+export type LeaderboardPeriod = 'today' | 'week' | 'all'
+
+export interface PeriodPlayer { userId: number; username: string; points: number; games: number; rank: number }
+export interface PeriodLeaderboard { period: LeaderboardPeriod; category: string | null; players: PeriodPlayer[] }
+export interface MyPosition { period: LeaderboardPeriod; category: string | null; rank: number | null; points: number; games: number }
+
+const periodQuery = (period: LeaderboardPeriod, category?: string | null) =>
+  `period=${period}${category ? `&category=${encodeURIComponent(category)}` : ''}`
+
+export const fetchPeriodLeaderboard = async (period: LeaderboardPeriod, category?: string | null): Promise<PeriodLeaderboard> => {
+  const res = await fetch(`${API_BASE_URL}/api/leaderboard?${periodQuery(period, category)}`)
+  if (!res.ok) throw new Error('Failed to fetch leaderboard')
+  return res.json()
+}
+
+export const fetchMyPosition = async (period: LeaderboardPeriod, category?: string | null): Promise<MyPosition | null> => {
+  const token = getUserToken()
+  if (!token) return null
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/leaderboard/me?${periodQuery(period, category)}`, { headers: { Authorization: `Bearer ${token}` } })
+    return res.ok ? res.json() : null
+  } catch { return null }
+}
+
+/** Saves a finished game for logged-in players (feeds the period leaderboards). Fire-and-forget. */
+export const submitGameResult = async (category: string, score: number, total: number, mode: string): Promise<void> => {
+  const token = getUserToken()
+  if (!token) return
+  try {
+    await fetch(`${API_BASE_URL}/api/leaderboard/game`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ category, score, total, mode }),
+    })
+  } catch { /* non-critical */ }
+}
+
+// ─── Beat challenges (smartassfacts.com/beat/CODE) ─────────────────────────────
+
+export interface BeatChallenge { code: string; category: string; score: number; total: number; name: string | null }
+
+export const createBeat = async (category: string, score: number, total: number, name?: string | null): Promise<string | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/beats`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category, score, total, name: name || undefined }),
+    })
+    if (!res.ok) return null
+    return (await res.json()).code as string
+  } catch { return null }
+}
+
+export const fetchBeat = async (code: string): Promise<BeatChallenge | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/beats/${encodeURIComponent(code)}`)
+    return res.ok ? res.json() : null
+  } catch { return null }
+}
+
 // ─── Daily Scores (anonymous session-based) ───────────────────────────────────
 
 export interface DailyRankResponse {

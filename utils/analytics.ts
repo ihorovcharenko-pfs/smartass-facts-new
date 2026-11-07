@@ -13,7 +13,7 @@ const GA_ID = 'G-MS3N10PT93'
 
 import { getConsent } from './consent'
 
-export type GameMode = 'single' | 'daily' | 'battle' | 'party'
+export type GameMode = 'single' | 'daily' | 'battle' | 'party' | 'beat'
 
 type EventParams = Record<string, string | number | boolean | undefined>
 

@@ -5,6 +5,15 @@ import { track } from '../utils/analytics'
 import { connectRoomSocket, disconnectRoomSocket } from '../utils/roomSocket'
 import type { Socket } from 'socket.io-client'
 import { fetchCategories, type Category } from '../services/clientService'
+import Button from './comic/Button'
+import Card from './comic/Card'
+import CategorySticker from './comic/CategorySticker'
+import Meter from './comic/Meter'
+import MascotBubble from './comic/MascotBubble'
+import ShareSheet from './comic/ShareSheet'
+import { useToast } from './comic/Toast'
+import logo from '../assets/smartass-logo.png'
+import '../styles/comic.scss'
 import '../styles/Room.scss'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -117,6 +126,38 @@ function medalFor(rank: number) {
   return `${rank}.`
 }
 
+// ─── Round timer (comic): "Round 8 of 10 · 12s" + draining bar ──────────────────
+
+function RoundTimer({ endsAt, total, round, rounds }: { endsAt: number; total: number; round: number; rounds: number }) {
+  const remaining = useCountdown(endsAt)
+  const secs = Math.ceil(remaining / 1000)
+  const urgent = secs <= 5
+  return (
+    <>
+      <div className="cp-cat-step">Round {round} of {rounds} · <span style={{ color: urgent ? 'var(--cp-orange)' : undefined, fontWeight: 900 }}>{secs}s</span></div>
+      <div className="cp-progress" role="progressbar" aria-label="Time left" aria-valuemin={0} aria-valuemax={Math.round(total / 1000)} aria-valuenow={secs}>
+        <div className="cp-progress__fill" style={{ width: `${(remaining / total) * 100}%`, background: urgent ? 'var(--cp-orange)' : 'var(--cp-lime)', transition: 'none' }} />
+      </div>
+    </>
+  )
+}
+
+// Module-level (a component defined inside RoomPage would remount every render and steal input focus)
+function Shell({ children, toast }: { children: React.ReactNode; toast: React.ReactNode }) {
+  return <div className="cp-screen"><div className="cp-col">{children}{toast}</div></div>
+}
+
+function Crown() {
+  return (
+    <svg className="cp-crown__hat" viewBox="0 0 120 80" aria-hidden="true">
+      <path d="M8 70 L16 18 L42 44 L60 8 L78 44 L104 18 L112 70 Z" fill="#ffd23f" stroke="#000" strokeWidth="6" strokeLinejoin="round" />
+      <circle cx="60" cy="8" r="7" fill="#ff6b35" stroke="#000" strokeWidth="4" />
+      <circle cx="16" cy="18" r="6" fill="#ff6b35" stroke="#000" strokeWidth="4" />
+      <circle cx="104" cy="18" r="6" fill="#ff6b35" stroke="#000" strokeWidth="4" />
+    </svg>
+  )
+}
+
 // ─── Main component ────────────────────────────────────────────────────────────
 
 function RoomPage({ navigate, initialCode }: RoomPageProps) {
@@ -136,6 +177,13 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   const socketRef = useRef<Socket>(null as unknown as Socket)
   const mySocketId = useRef<string>('')
   const isHostRef = useRef(false)
+  const [board, setBoard] = useState<PlayerInfo[]>([])
+  const lastFactRef = useRef('')
+  const myCorrectRef = useRef(0)
+  const [shareOpen, setShareOpen] = useState(false)
+  const [pickingCat, setPickingCat] = useState(false)
+  const [rematchCat, setRematchCat] = useState('')
+  const { toast, node: toastNode } = useToast()
   const roomMeta = useRef({ category: '', players: 1 })
 
   // ── Fetch categories for create screen ──────────────────────────────────────
@@ -145,7 +193,10 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
         c.saCategory.toLowerCase() !== 'game of the day'
       )
       setCategories(playable)
-      if (playable.length > 0) setSelectedCategory(playable[0].saCategory)
+      // /room?cat=Past%20Drama (from "Challenge a friend 1-on-1") preselects the category
+      const wanted = new URLSearchParams(window.location.search).get('cat')
+      const pre = playable.find(c => c.saCategory === wanted)
+      if (playable.length > 0) setSelectedCategory((pre ?? playable[0]).saCategory)
     })
   }, [])
 
@@ -161,6 +212,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
     socket.on('room:created', ({ code, category, players }) => {
       isHostRef.current = true
+      setBoard(players)
       roomMeta.current = { category, players: players.length }
       track('party_room_created', { category_name: category, mode: 'party' })
       setLoading(false)
@@ -174,6 +226,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
     socket.on('room:joined', ({ code, category, players, hostSocketId }) => {
       roomMeta.current = { category, players: players.length }
+      setBoard(players)
       setLoading(false)
       setErrorMsg('')
       setPhase({
@@ -187,6 +240,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
 
     socket.on('room:player_joined', ({ player }: { player: PlayerInfo }) => {
       roomMeta.current.players += 1
+      setBoard(prev => prev.find(p => p.socketId === player.socketId) ? prev : [...prev, player])
       setPhase(prev => {
         if (prev.tag !== 'lobby') return prev
         if (prev.players.find(p => p.socketId === player.socketId)) return prev
@@ -195,6 +249,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     })
 
     socket.on('room:player_left', ({ socketId }: { socketId: string; playerName: string }) => {
+      setBoard(prev => prev.filter(p => p.socketId !== socketId))
       setPhase(prev => {
         if (prev.tag === 'lobby') {
           return { ...prev, players: prev.players.filter(p => p.socketId !== socketId) }
@@ -208,6 +263,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     })
 
     socket.on('room:question', ({ index, total, saFact, endsAt }) => {
+      lastFactRef.current = saFact
       setPhase(prev => {
         const code = prev.tag === 'lobby' || prev.tag === 'question' || prev.tag === 'reveal'
           ? prev.code : ''
@@ -241,6 +297,9 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
     })
 
     socket.on('room:reveal', (data: RevealData) => {
+      setBoard(prev => data.results.map(r => ({ socketId: r.socketId, name: r.playerName, score: r.totalScore })).concat(prev.filter(p => !data.results.find(r => r.socketId === p.socketId))))
+      const mine = data.results.find(r => r.socketId === socketRef.current.id)
+      if (mine?.correct) myCorrectRef.current += 1
       setPhase(prev => {
         if (prev.tag !== 'question') return prev
         return { tag: 'reveal', code: prev.code, category: prev.category, isHost: prev.isHost, data }
@@ -251,6 +310,15 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       // Host only, so each Party game is counted once, not once per player.
       if (isHostRef.current) track('party_game_complete', { category_name: roomMeta.current.category, mode: 'party', players: finalScores.length, final_score: finalScores[0]?.score })
       setPhase({ tag: 'finished', finalScores })
+    })
+
+    // Host started a rematch: everyone stays in the room and returns to the lobby
+    socket.on('room:rematch', ({ code, category, players, hostSocketId }: { code: string; category: string; players: PlayerInfo[]; hostSocketId: string }) => {
+      myCorrectRef.current = 0
+      roomMeta.current = { category, players: players.length }
+      setBoard(players)
+      setLoading(false); setErrorMsg(''); setPickingCat(false); setShareOpen(false)
+      setPhase({ tag: 'lobby', code, category, players, isHost: socket.id === hostSocketId })
     })
 
     socket.on('room:host_left', () => {
@@ -273,6 +341,7 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
       socket.off('room:answer_count')
       socket.off('room:reveal')
       socket.off('room:finished')
+      socket.off('room:rematch')
       socket.off('room:host_left')
       socket.off('room:error')
       disconnectRoomSocket()
@@ -330,368 +399,293 @@ function RoomPage({ navigate, initialCode }: RoomPageProps) {
   // ── Render helpers ──────────────────────────────────────────────────────────
 
   const goHome = () => navigate('/')
+  const myId = socketRef.current?.id
+  const others = (board.length ? board : []).filter(p => p.socketId !== myId)
+  const me = board.find(p => p.socketId === myId)
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // CREATE SCREEN
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══ CREATE ════════════════════════════════════════════════════════════════
   if (phase.tag === 'create') {
     return (
-      <div className="room">
-        <div className="room-setup">
-          <div className="room-setup__icon">🎮</div>
-          <h1 className="room-setup__title">Party Mode</h1>
-          <p className="room-setup__sub">Create a room, share the code, and play together live.</p>
-
-          {errorMsg && <div className="room-setup__error">{errorMsg}</div>}
-
-          <label className="room-setup__label">
-            Your name
-            <input
-              className="room-setup__input"
-              placeholder="e.g. Gigi"
-              value={hostName}
-              onChange={e => setHostName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleCreate()}
-              maxLength={20}
-              autoFocus
-            />
-          </label>
-
-          <label className="room-setup__label">
-            Category
-            <select
-              className="room-setup__select"
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-            >
-              {categories.map(c => (
-                <option key={c.id} value={c.saCategory}>{c.saCategory}</option>
-              ))}
-            </select>
-          </label>
-
-          <button className="room-setup__btn room-setup__btn--primary" onClick={handleCreate} disabled={loading}>
-            {loading ? 'Creating…' : 'Create Room →'}
-          </button>
-
-          <div className="room-setup__divider">or</div>
-
-          <button className="room-setup__btn room-setup__btn--secondary" onClick={goHome}>
-            Back to home
-          </button>
+      <Shell toast={toastNode}>
+        <div className="cp-topbar" style={{ justifyContent: 'flex-start' }}>
+          <Button variant="yellow" size="round" aria-label="Back to home" onClick={goHome}>←</Button>
         </div>
-      </div>
+        <h1 className="cp-h1 cp-h1--yellow">PARTY MODE</h1>
+        <p className="cp-sub">Create a room, share the code, and play together live.</p>
+
+        {errorMsg && <Card tone="navy" role="alert" style={{ borderColor: 'var(--cp-orange)' }}>{errorMsg}</Card>}
+
+        <label className="cp-field">
+          <span className="cp-label">Your name</span>
+          <input className="cp-input" placeholder="Gigi" value={hostName} onChange={e => setHostName(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCreate()} maxLength={20} autoFocus />
+        </label>
+        <label className="cp-field">
+          <span className="cp-label">Category</span>
+          <select className="cp-input" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+            {categories.map(c => <option key={c.id} value={c.saCategory}>{c.saCategory}</option>)}
+          </select>
+        </label>
+
+        <div className="cp-spacer" />
+        <Button variant="yellow" block onClick={handleCreate} disabled={loading}>{loading ? 'Creating…' : 'Create room'}</Button>
+        <Button variant="ghost" block onClick={goHome}>Back to home</Button>
+      </Shell>
     )
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // JOIN SCREEN (arrived via /room/CODE link)
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══ JOIN (arrived via /room/CODE) ═════════════════════════════════════════
   if (phase.tag === 'joining') {
     return (
-      <div className="room">
-        <div className="room-setup">
-          <div className="room-setup__icon">⚡</div>
-          <h1 className="room-setup__title">You're invited!</h1>
-          <p className="room-setup__sub">Enter your name to join the room.</p>
-
-          <div className="room-setup__code-display">{phase.code}</div>
-
-          {errorMsg && <div className="room-setup__error">{errorMsg}</div>}
-
-          <label className="room-setup__label">
-            Your name
-            <input
-              className="room-setup__input"
-              placeholder="e.g. Alice"
-              value={joinName}
-              onChange={e => setJoinName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleJoin()}
-              maxLength={20}
-              autoFocus
-            />
-          </label>
-
-          <button className="room-setup__btn room-setup__btn--primary" onClick={handleJoin} disabled={loading}>
-            {loading ? 'Joining…' : 'Join Game →'}
-          </button>
-
-          <button className="room-setup__btn room-setup__btn--secondary" onClick={goHome}>
-            Back to home
-          </button>
-        </div>
-      </div>
+      <Shell toast={toastNode}>
+        <h1 className="cp-h1 cp-h1--yellow">YOU&apos;RE INVITED!</h1>
+        <p className="cp-sub">Enter your name to join the room.</p>
+        <Card tilt="l" style={{ textAlign: 'center', fontSize: '2.4rem', fontWeight: 900, letterSpacing: '0.2em' }} aria-label={`Room code ${phase.code}`}>{phase.code}</Card>
+        {errorMsg && <Card tone="navy" role="alert" style={{ borderColor: 'var(--cp-orange)' }}>{errorMsg}</Card>}
+        <label className="cp-field">
+          <span className="cp-label">Your name</span>
+          <input className="cp-input" placeholder="Gigi" value={joinName} onChange={e => setJoinName(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleJoin()} maxLength={20} autoFocus />
+        </label>
+        <div className="cp-spacer" />
+        <Button variant="yellow" block onClick={handleJoin} disabled={loading}>{loading ? 'Joining…' : 'Join game'}</Button>
+        <Button variant="ghost" block onClick={goHome}>Back to home</Button>
+      </Shell>
     )
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // LOBBY
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══ LOBBY ═════════════════════════════════════════════════════════════════
   if (phase.tag === 'lobby') {
     const { code, category, players, isHost } = phase
     return (
-      <div className="room">
-        <div className="room-lobby">
-          <div className="room-lobby__code">
-            <p className="room-lobby__code-label">Room Code</p>
-            <p className="room-lobby__code-value">{code}</p>
-            <p className="room-lobby__category">{category}</p>
+      <Shell toast={toastNode}>
+        <div className="cp-cat-row">
+          <CategorySticker category={category} />
+          <div className="cp-cat-meta">
+            <span className="cp-label">Room code</span>
+            <div className="cp-cat-name" style={{ letterSpacing: '0.12em' }} aria-label={`Room code ${code}`}>{code}</div>
+            <div className="cp-cat-step">{category}</div>
           </div>
-
-          <button className="room-lobby__share" onClick={() => handleShare(code)}>
-            <span>🔗</span>
-            <span>Share invite link</span>
-            <span>{shareCopied ? 'Copied!' : 'Tap to copy'}</span>
-          </button>
-
-          {errorMsg && <div className="room-setup__error">{errorMsg}</div>}
-
-          <p className="room-lobby__players-title">
-            Players ({players.length}/10)
-          </p>
-
-          <div className="room-lobby__player-list">
-            {players.map(p => (
-              <div key={p.socketId} className="room-lobby__player">
-                <div className="room-lobby__player-avatar">{initials(p.name)}</div>
-                <span className="room-lobby__player-name">{p.name}</span>
-                {p.socketId === socketRef.current.id && (
-                  <span className="room-lobby__player-badge">You</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {isHost ? (
-            <button
-              className="room-setup__btn room-setup__btn--primary"
-              onClick={handleStart}
-              disabled={players.length < 2}
-              style={{ marginTop: '0.5rem' }}
-            >
-              {players.length < 2 ? 'Waiting for players…' : `Start Game (${players.length} players)`}
-            </button>
-          ) : (
-            <p className="room-lobby__waiting">Waiting for the host to start…</p>
-          )}
         </div>
-      </div>
+
+        <Button variant="white" onClick={async () => { await handleShare(code); }} aria-label="Invite friends: share the room link">
+          {shareCopied ? 'Link copied!' : '🔗 Invite friends'}
+        </Button>
+
+        <h2 className="cp-label" style={{ margin: '6px 0 0' }}>Players ({players.length})</h2>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {players.map(p => (
+            <li key={p.socketId} className={`cp-rank-row${p.socketId === myId ? ' cp-rank-row--me' : ''}`}>
+              <span className="cp-rank-row__avatar" aria-hidden="true">{initials(p.name)}</span>
+              <span className="cp-rank-row__name">{p.name}</span>
+              {p.socketId === myId && <span className="cp-chip" style={{ minHeight: 28, padding: '0 10px' }}>You</span>}
+            </li>
+          ))}
+        </ul>
+
+        {errorMsg && <Card tone="navy" role="alert" style={{ borderColor: 'var(--cp-orange)' }}>{errorMsg}</Card>}
+        <div className="cp-spacer" />
+        {isHost ? (
+          <Button variant="yellow" block onClick={handleStart} disabled={players.length < 2}>
+            {players.length < 2 ? 'Waiting for players…' : `Start game (${players.length} players)`}
+          </Button>
+        ) : (
+          <Card tone="navy" style={{ textAlign: 'center', fontWeight: 800 }} role="status">Waiting for the host to start…</Card>
+        )}
+      </Shell>
     )
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // QUESTION
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══ QUESTION (player turn) ════════════════════════════════════════════════
   if (phase.tag === 'question') {
-    const { data, answered, userAnswer, answeredCount, playerCount } = phase
-    const answerPct = playerCount > 0 ? (answeredCount / playerCount) * 100 : 0
-
+    const { data, answered, userAnswer, answeredCount, playerCount, category } = phase
+    const peek = others.length === 1 ? `NO PEEKING AT ${others[0].name.toUpperCase()}\u2019S PHONE.` : 'EVERYONE ANSWERS AT ONCE. NO PEEKING.'
     return (
-      <div className="room">
-        <div className="room-question">
-          <div className="room-question__header">
-            <span className="room-question__progress">
-              Question {data.index + 1} / {data.total}
-            </span>
-          </div>
-
-          <Countdown endsAt={data.endsAt} total={15_000} />
-
-          <div className="room-question__card">
-            <p className="room-question__label">True or false?</p>
-            <p className="room-question__text">{data.saFact}</p>
-          </div>
-
-          <div className="room-question__buttons">
-            <button
-              className={`room-question__btn room-question__btn--fact ${answered && userAnswer === true ? 'room-question__btn--selected-fact' : ''}`}
-              onClick={() => handleAnswer(true)}
-              disabled={answered}
-            >
-              ✓ Fact
-            </button>
-            <button
-              className={`room-question__btn room-question__btn--fake ${answered && userAnswer === false ? 'room-question__btn--selected-fake' : ''}`}
-              onClick={() => handleAnswer(false)}
-              disabled={answered}
-            >
-              ✗ Fake
-            </button>
-          </div>
-
-          <div className="room-question__answered">
-            {answered
-              ? <><strong>{answeredCount}</strong> of {playerCount} answered</>
-              : <span>Tap your answer above</span>
-            }
-          </div>
-
-          <div className="room-question__answer-bar">
-            <div className="room-question__answer-fill" style={{ width: `${answerPct}%` }} />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // REVEAL
-  // ═══════════════════════════════════════════════════════════════════════════
-  if (phase.tag === 'reveal') {
-    const { data, isHost } = phase
-    const { correctAnswer, explanation, results, isLast } = data
-
-    return (
-      <div className="room">
-        <div className="room-reveal">
-          <div className={`room-reveal__verdict room-reveal__verdict--${correctAnswer ? 'fact' : 'fake'}`}>
-            <p className="room-reveal__verdict-label">{correctAnswer ? 'That\'s a Fact ✓' : 'That\'s Fake ✗'}</p>
-            <p className="room-reveal__verdict-text">{correctAnswer ? 'It\'s TRUE!' : 'It\'s FALSE!'}</p>
-            {explanation && <p className="room-reveal__explanation">{explanation}</p>}
-          </div>
-
-          <p className="room-reveal__scores-title">Scores after Q{data.questionIndex + 1}</p>
-
-          <div className="room-reveal__score-list">
-            {results.map((r, i) => (
-              <div key={r.socketId} className="room-reveal__score-row">
-                <span className="room-reveal__rank">{i + 1}</span>
-                <span className="room-reveal__player-name">
-                  {r.playerName}
-                  {r.socketId === socketRef.current.id && ' (you)'}
-                </span>
-                <span className="room-reveal__result-icon">
-                  {r.answer === null ? '–' : r.correct ? '✓' : '✗'}
-                </span>
-                <span className={`room-reveal__points ${r.pointsEarned === 0 ? 'room-reveal__points--zero' : ''}`}>
-                  {r.pointsEarned > 0 ? `+${r.pointsEarned}` : '+0'}
-                </span>
-                <span className="room-reveal__total">{r.totalScore}</span>
+      <Shell toast={toastNode}>
+        <div className="cp-topbar">
+          <Button variant="yellow" size="round" aria-label="Leave game and go home" onClick={goHome}>✕</Button>
+          <div style={{ display: 'flex', gap: 8, flex: 1, minWidth: 0 }}>
+            <div className="cp-score-card cp-score-card--active">
+              <div style={{ minWidth: 0 }}><small>{answered ? 'Locked in' : 'Your turn'}</small><b>{me?.name ?? 'You'}</b></div>
+              <strong>{me?.score ?? 0}</strong>
+            </div>
+            {others[0] && (
+              <div className="cp-score-card">
+                <div style={{ minWidth: 0 }}><small>{others.length > 1 ? `+${others.length - 1} more` : 'Waiting'}</small><b>{others[0].name}</b></div>
+                <strong>{others[0].score}</strong>
               </div>
-            ))}
+            )}
           </div>
-
-          {isHost ? (
-            <button
-              className="room-setup__btn room-setup__btn--primary"
-              onClick={handleNext}
-              style={{ marginTop: '0.5rem' }}
-            >
-              {isLast ? 'See Final Results →' : 'Next Question →'}
-            </button>
-          ) : (
-            <p className="room-lobby__waiting" style={{ marginTop: '0.5rem' }}>
-              Waiting for host to continue…
-            </p>
-          )}
         </div>
-      </div>
+
+        <div className="cp-cat-row">
+          <CategorySticker category={category} />
+          <div className="cp-cat-meta">
+            <h1 className="cp-cat-name">{category}</h1>
+            <RoundTimer endsAt={data.endsAt} total={15_000} round={data.index + 1} rounds={data.total} />
+          </div>
+        </div>
+
+        <MascotBubble label={peek} text={data.saFact} />
+
+        <div className="cp-spacer" />
+
+        <div className="cp-row">
+          <Button variant="white" size="huge" sub="nice try" disabled={answered} className={answered && userAnswer === false ? 'is-pressed' : ''} aria-pressed={answered && userAnswer === false} onClick={() => handleAnswer(false)}>FAKE</Button>
+          <Button variant="yellow" size="huge" sub="for real" disabled={answered} className={answered && userAnswer === true ? 'is-pressed' : ''} aria-pressed={answered && userAnswer === true} onClick={() => handleAnswer(true)}>FACT</Button>
+        </div>
+        <p className="cp-sub cp-muted" style={{ fontWeight: 700, fontSize: '0.875rem' }} role="status">
+          {answered ? `${answeredCount} of ${playerCount} locked in` : 'Answer fast: speed earns bonus points'}
+        </p>
+      </Shell>
     )
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // FINISHED
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══ REVEAL (same BS-o-meter as solo) ══════════════════════════════════════
+  if (phase.tag === 'reveal') {
+    const { data, isHost, category } = phase
+    const { correctAnswer, explanation, results, isLast } = data
+    const mine = results.find(r => r.socketId === myId)
+    const timedOut = !!mine && mine.answer === null
+    const nailed = !!mine?.correct
+    const truth = correctAnswer ? 'a FACT' : 'FAKE'
+    const subline = timedOut ? `Too slow. It\u2019s ${truth}.`
+      : nailed ? `It\u2019s ${truth}. +${mine!.pointsEarned} points`
+      : `You said ${mine?.answer ? 'FACT' : 'FAKE'}. It\u2019s ${truth}.`
+    return (
+      <Shell toast={toastNode}>
+        <div className="cp-topbar">
+          <Button variant="yellow" size="round" aria-label="Leave game and go home" onClick={goHome}>✕</Button>
+          <span className={`cp-chip${nailed ? ' cp-chip--lime' : ' cp-chip--dim'}`}>{me?.score ?? mine?.totalScore ?? 0} pts</span>
+        </div>
+        <Meter isFact={correctAnswer} />
+        <div>
+          <h1 className={`cp-h1 ${nailed ? 'cp-h1--yellow' : 'cp-h1--orange'}`} role="status">{nailed ? 'NAILED IT!' : timedOut ? 'TOO SLOW!' : 'BUSTED!'}</h1>
+          <p className="cp-sub">{subline}</p>
+        </div>
+        <Card tilt="l" className="cp-reveal-card">
+          {correctAnswer ? (
+            <>
+              <span className="cp-reveal-card__label">Meanwhile, in {category}</span>
+              <p className="cp-reveal-card__text">{explanation?.trim() || 'Yep, that one\u2019s real.'}</p>
+            </>
+          ) : (
+            <>
+              <p className="cp-reveal-card__struck">{lastFactRef.current}</p>
+              <p className="cp-reveal-card__fake">It&apos;s not a real fact, it&apos;s just our fantasy. Now you know 🐒</p>
+            </>
+          )}
+        </Card>
+
+        <h2 className="cp-label" style={{ margin: 0 }}>Standings after round {data.questionIndex + 1}</h2>
+        <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {results.map((r, i) => (
+            <li key={r.socketId} className={`cp-rank-row${r.socketId === myId ? ' cp-rank-row--me' : ''}`}>
+              <span className="cp-rank-row__rank">{i + 1}</span>
+              <span className="cp-rank-row__name">{r.playerName}{r.socketId === myId ? ' (you)' : ''}</span>
+              <span aria-label={r.answer === null ? 'no answer' : r.correct ? 'correct' : 'wrong'}>{r.answer === null ? '–' : r.correct ? '✓' : '✗'}</span>
+              <span className="cp-rank-row__pts">{r.totalScore}</span>
+            </li>
+          ))}
+        </ol>
+
+        <div className="cp-spacer" />
+        {isHost ? (
+          <Button variant="yellow" block onClick={handleNext}>{isLast ? 'SEE FINAL RESULTS' : 'NEXT FACT'}</Button>
+        ) : (
+          <Card tone="navy" style={{ textAlign: 'center', fontWeight: 800 }} role="status">Waiting for the host to continue…</Card>
+        )}
+      </Shell>
+    )
+  }
+
+  // ═══ GAME OVER ═════════════════════════════════════════════════════════════
   if (phase.tag === 'finished') {
     const { finalScores } = phase
-    const winner = finalScores[0]
-
-    const shareText = `🎮 Smartass Facts Party Mode results:\n${finalScores.map(p => `${medalFor(p.rank)} ${p.name}: ${p.score} pts`).join('\n')}\nPlay at smartassfacts.com`
-
-    const handleShareNative = async () => {
-      try {
-        if (navigator.share) await navigator.share({ text: shareText, url: 'https://smartassfacts.com' })
-        else await navigator.clipboard.writeText(shareText)
-      } catch { /* dismissed */ }
-    }
-
-    const handleShareX = () => {
-      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`
-      window.open(url, '_blank', 'noopener')
-    }
-
-    const handleShareInstagram = async () => {
-      // Instagram doesn't support direct text share; copy to clipboard instead
-      await navigator.clipboard.writeText(shareText)
-      alert('Result copied! Paste it into your Instagram story or post.')
-    }
-
-    const handleShareTikTok = async () => {
-      await navigator.clipboard.writeText(shareText)
-      alert('Result copied! Paste it into your TikTok caption.')
-    }
-
-    const handleReplay = () => {
-      setPhase({ tag: 'create' })
+    const topScore = finalScores[0]?.score ?? 0
+    const winners = finalScores.filter(p => p.score === topScore)
+    const tie = winners.length > 1
+    const winner = winners[0]
+    const category = roomMeta.current.category
+    const isHost = isHostRef.current
+    const headline = tie ? 'IT\u2019S A TIE!' : `${winner.name.toUpperCase()} WINS!`
+    const subline = tie ? 'Nobody blinks. Rematch?'
+      : finalScores.length === 2 ? `${finalScores[1].name} demands a rematch. Obviously.`
+      : 'The room has spoken. The monkey approves.'
+    const rematch = (newCategory: boolean) => {
+      track('rematch', { same_category: !newCategory, mode: 'party', category_name: category })
+      socketRef.current.emit('room:rematch', newCategory ? { category: rematchCat || undefined } : {})
     }
 
     return (
-      <div className="room">
-        <div className="room-finished">
-          <div className="room-finished__trophy">🏆</div>
-          <h1 className="room-finished__title">Game Over!</h1>
-          {winner && (
-            <p className="room-finished__winner">
-              <span className="room-finished__winner-name">{winner.name}</span> wins with {winner.score} pts!
-            </p>
-          )}
-
-          <div className="room-finished__podium">
-            {finalScores.map(p => (
-              <div key={p.socketId} className={`room-finished__row ${p.rank === 1 ? 'room-finished__row--first' : ''}`}>
-                <span className="room-finished__medal">{medalFor(p.rank)}</span>
-                <span className="room-finished__name">
-                  {p.name}
-                  {p.socketId === socketRef.current.id && <span className="room-finished__you-badge"> you</span>}
-                </span>
-                <span className="room-finished__score">{p.score} pts</span>
-              </div>
-            ))}
-          </div>
-
-          <p className="room-finished__share-label">Share results</p>
-          <div className="room-finished__share-row">
-            <button className="room-finished__share-btn room-finished__share-btn--x" onClick={handleShareX} title="Share on X">
-              𝕏
-            </button>
-            <button className="room-finished__share-btn room-finished__share-btn--ig" onClick={handleShareInstagram} title="Share on Instagram">
-              📸
-            </button>
-            <button className="room-finished__share-btn room-finished__share-btn--tt" onClick={handleShareTikTok} title="Share on TikTok">
-              🎵
-            </button>
-            <button className="room-finished__share-btn room-finished__share-btn--more" onClick={handleShareNative} title="More options">
-              ↗
-            </button>
-          </div>
-
-          <div className="room-finished__actions">
-            <button className="room-setup__btn room-setup__btn--primary" onClick={handleReplay}>
-              🔄 Play Again
-            </button>
-            <button className="room-setup__btn room-setup__btn--secondary" onClick={goHome}>
-              Back to home
-            </button>
-          </div>
+      <Shell toast={toastNode}>
+        <span className="cp-label" style={{ textAlign: 'center' }}>Game over: {category}</span>
+        <div className="cp-crown">
+          <Crown />
+          <div className="cp-mascot cp-mascot--ring"><img src={logo.src} alt="" /></div>
         </div>
-      </div>
+        <div>
+          <h1 className="cp-h1 cp-h1--yellow" role="status">{headline}</h1>
+          <p className="cp-sub">{subline}</p>
+        </div>
+
+        <div className="cp-row" style={{ flexWrap: 'wrap' }}>
+          {finalScores.slice(0, 6).map(p => (
+            <div key={p.socketId} className={`cp-score-card${winners.includes(p) ? ' cp-score-card--winner' : ''}`} style={{ flexDirection: 'column', alignItems: 'center', textAlign: 'center', minWidth: 140 }}>
+              <b>{p.name}{p.socketId === myId ? ' (you)' : ''}</b>
+              <strong style={{ fontSize: '2.4rem' }}>{p.score}</strong>
+              <small>{winners.includes(p) ? (tie ? 'Tied' : 'Winner') : 'So close'}</small>
+            </div>
+          ))}
+        </div>
+
+        <div className="cp-spacer" />
+
+        {isHost ? (
+          <>
+            <Button variant="orange" block onClick={() => rematch(false)}>Rematch: same category</Button>
+            {pickingCat ? (
+              <Card tone="navy">
+                <label className="cp-field">
+                  <span className="cp-label">New category</span>
+                  <select className="cp-input" value={rematchCat || category} onChange={e => setRematchCat(e.target.value)}>
+                    {categories.map(c => <option key={c.id} value={c.saCategory}>{c.saCategory}</option>)}
+                  </select>
+                </label>
+                <div style={{ marginTop: 12 }}><Button variant="yellow" block onClick={() => rematch(true)}>Start rematch</Button></div>
+              </Card>
+            ) : (
+              <Button variant="yellow" block onClick={() => { setRematchCat(category); setPickingCat(true) }}>Rematch: new category</Button>
+            )}
+          </>
+        ) : (
+          <Card tone="navy" style={{ textAlign: 'center', fontWeight: 800 }} role="status">Waiting for the host to start a rematch…</Card>
+        )}
+        <div className="cp-row">
+          <Button variant="white" onClick={() => setShareOpen(true)}>Share result</Button>
+          <Button variant="ghost" onClick={goHome}>Home</Button>
+        </div>
+        {errorMsg && <Card tone="navy" role="alert" style={{ borderColor: 'var(--cp-orange)' }}>{errorMsg}</Card>}
+
+        <ShareSheet
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          category={category}
+          score={Math.min(myCorrectRef.current, 10)}
+          total={10}
+          mode="party"
+          name={me?.name}
+        />
+      </Shell>
     )
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // ERROR
-  // ═══════════════════════════════════════════════════════════════════════════
+  // ═══ ERROR ═════════════════════════════════════════════════════════════════
   return (
-    <div className="room">
-      <div className="room-setup" style={{ textAlign: 'center' }}>
-        <div className="room-setup__icon">😕</div>
-        <h1 className="room-setup__title">Oops</h1>
-        <p className="room-setup__sub">{(phase as { tag: 'error'; message: string }).message}</p>
-        <button className="room-setup__btn room-setup__btn--primary" onClick={goHome}>
-          Back to home
-        </button>
-      </div>
-    </div>
+    <Shell toast={toastNode}>
+      <h1 className="cp-h1 cp-h1--orange">OOPS</h1>
+      <p className="cp-sub" role="alert">{phase.tag === 'error' ? phase.message : 'Something went wrong.'}</p>
+      <div className="cp-spacer" />
+      <Button variant="yellow" block onClick={goHome}>Back to home</Button>
+    </Shell>
   )
 }
 

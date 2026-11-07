@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
-import GamePage from './GamePage'
+import GamePage, { type BeatInfo } from './GamePage'
 import GamePageSkeleton from './GamePageSkeleton'
 import { fetchFactsForClient, fetchPersonalizedFacts, type Fact } from '../services/clientService'
 import { getSkipIds, getPoolId, getSessionToken } from '../utils/localStorage'
@@ -34,6 +34,17 @@ function GameRoute({ navigate }: GameRouteProps) {
   const searchParams = useSearchParams()
   const category = searchParams.get(CAT_PARAM)
   const source = searchParams.get('src') ?? 'direct'
+  const beatCode = searchParams.get('beat')
+  // /beat/CODE stashes the challenge in sessionStorage before redirecting here
+  const [beat, setBeat] = useState<BeatInfo | null>(null)
+  useEffect(() => {
+    if (!beatCode) { setBeat(null); return }
+    try {
+      const raw = sessionStorage.getItem('sa_beat')
+      const b = raw ? JSON.parse(raw) : null
+      setBeat(b && b.code === beatCode ? b : null)
+    } catch { setBeat(null) }
+  }, [beatCode])
   const [loadError, setLoadError] = useState(false)
   const requestRef = useRef(0)
 
@@ -131,6 +142,7 @@ function GameRoute({ navigate }: GameRouteProps) {
       facts={gameFacts}
       category={category}
       source={source}
+      beat={beat}
       onBack={handleBack}
       onContinue={handleContinue}
       onPlayAgain={handlePlayAgain}
