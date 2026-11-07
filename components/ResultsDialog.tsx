@@ -8,7 +8,6 @@ import ShareSheet from './comic/ShareSheet'
 import EmailCaptureForm from './EmailCaptureForm'
 import LeaderboardBanner from './LeaderboardBanner'
 import PushPrompt from './PushPrompt'
-import { useApp } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import { submitGameResult } from '../services/clientService'
 import { incrementGamesPlayed } from '../utils/localStorage'
@@ -33,7 +32,6 @@ interface ResultsDialogProps {
 }
 
 function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStreak, isDaily = false, beat = null, mode = 'single', onContinue, onPlayAgain, onChallengeFriend }: ResultsDialogProps) {
-  const { navigate } = useApp()
   const { user, openAuthModal } = useAuth()
   const [shareOpen, setShareOpen] = useState(false)
   const [challengeState, setChallengeState] = useState<'idle' | 'loading' | 'copied'>('idle')
@@ -69,6 +67,7 @@ function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStr
 
   const challengeLink = async () => {
     if (!onChallengeFriend) return
+    track('challenge_click', { category_name: category, category, mode })
     setChallengeState('loading')
     try {
       const url = await onChallengeFriend()
@@ -80,12 +79,6 @@ function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStr
     } catch {
       setChallengeState('idle')
     }
-  }
-
-  // "Challenge a friend 1-on-1" opens Party Mode with this category preselected
-  const challenge = () => {
-    track('challenge_click', { category_name: category, category, mode })
-    navigate('/room', `cat=${encodeURIComponent(category)}`)
   }
 
   return (
@@ -120,16 +113,15 @@ function ResultsDialog({ category, correctCount, wrongCount, totalCount, bestStr
 
         <div className="cp-spacer" />
 
-        <Button variant="orange" block onClick={challenge}>👥&nbsp; Challenge a friend 1-on-1</Button>
+        {onChallengeFriend && (
+          <Button variant="orange" block disabled={challengeState === 'loading'} onClick={challengeLink}>
+            {challengeState === 'loading' ? '⏳ Creating challenge…' : challengeState === 'copied' ? '✓ Link copied!' : '⚔️ Challenge a friend'}
+          </Button>
+        )}
         <div className="cp-row">
           <Button variant="white" onClick={() => setShareOpen(true)}>Share score</Button>
           <Button variant="yellow" onClick={onPlayAgain}>Play again</Button>
         </div>
-        {onChallengeFriend && (
-          <Button variant="ghost" block disabled={challengeState === 'loading'} onClick={challengeLink}>
-            {challengeState === 'loading' ? '⏳ Creating challenge…' : challengeState === 'copied' ? '✓ Link copied!' : '⚔️ Challenge a friend'}
-          </Button>
-        )}
         <button type="button" className="cp-link" onClick={onContinue}>Pick another category</button>
 
         {!user && (
