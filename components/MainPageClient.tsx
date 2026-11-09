@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import flagIcon from '../assets/flag.png'
 import { getImageUrl, getUserToken, type Group, type Category } from '../services/clientService'
 import { useApp } from '../context/AppContext'
+import HowItWorksVideo from './HowItWorksVideo'
 import '../styles/MainPage.scss'
 
 // ── Category image map (sa_category → public asset path) ─────────────────────
@@ -135,6 +136,7 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
             value={searchText}
             onChange={e => onSearchChange(e.target.value)}
           />
+          <HowItWorksVideo />
         </div>
       </div>
 

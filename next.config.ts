@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   // file tracing (and Vercel's build) uses client-next, not the parent folder.
   turbopack: { root: __dirname },
   outputFileTracingRoot: __dirname,
+  async headers() {
+    return [
+      // Explainer video/poster: cache a day at the edge/browser, serve stale while revalidating
+      { source: '/media/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }] },
+    ]
+  },
   async redirects() {
     return [
       // Old VPS sitemaps Google still has cached — point to the single Next.js sitemap
