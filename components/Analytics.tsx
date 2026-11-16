@@ -8,7 +8,7 @@
 // keeps ~300 KB of third-party JS off the LCP path. Pageviews still fire.
 import { useEffect } from 'react'
 import { getConsent } from '../utils/consent'
-import { captureLanding, flushLanding } from '../utils/landing'
+import { captureLanding, flushLanding, setGaEnabled } from '../utils/landing'
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 
@@ -30,12 +30,17 @@ export default function Analytics() {
       const gtm = document.createElement('script')
       gtm.text =
         "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}" +
+        // Nothing goes to GA4 before the visitor accepts (kill switch flipped in utils/landing.ts)
+        "window['ga-disable-G-MS3N10PT93']=true;" +
         // Consent mode: analytics DENIED until the visitor accepts (stored choice restored here)
         "gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});" +
         "try{if(localStorage.getItem('sa_consent')==='granted')gtag('consent','update',{analytics_storage:'granted'});}catch(e){}" +
-        "gtag('js',new Date());gtag('config','G-MS3N10PT93');" +
+        "gtag('js',new Date());gtag('config','G-MS3N10PT93',{send_page_view:false});" +
         "(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KBFTJDH2');"
       document.head.appendChild(gtm)
+      // GA is loading with consent already granted (returning visitor, or Accept before
+      // GA loaded): lift the kill switch; the container's Google tag sends the page_view.
+      if (getConsent() === 'granted') flushLanding(false)
 
       const w = window as unknown as {
         amplitude?: { add: (p: unknown) => void; init: (k: string, o: unknown) => void }
@@ -104,16 +109,16 @@ export default function Analytics() {
       else loadThirdParty()
     }, 2500)
 
-    // Accepting later (banner) starts the consent-gated trackers right away.
+    // Accepting later (banner) starts the consent-gated trackers right away and sends
+    // the landing page_view as the first GA4 hit.
     const onConsent = () => {
-      // If GA was already loaded, its landing page_view went out under denied consent
-      // and carried no campaign data: replay it now. If GA loads only now, its own
-      // page_view will carry consent, so a replay would be a duplicate.
       const gaWasLoaded = loaded
       loadThirdParty()
       if (getConsent() === 'granted') {
         loadTrackers()
-        flushLanding(gaWasLoaded)
+        if (gaWasLoaded) flushLanding(true)
+      } else {
+        setGaEnabled(false)
       }
     }
     window.addEventListener('sa-consent', onConsent)
