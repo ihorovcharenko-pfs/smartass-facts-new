@@ -8,12 +8,16 @@
 // keeps ~300 KB of third-party JS off the LCP path. Pageviews still fire.
 import { useEffect } from 'react'
 import { getConsent } from '../utils/consent'
+import { captureLanding, flushLanding } from '../utils/landing'
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 
 export default function Analytics() {
   useEffect(() => {
     if (!IS_PROD) return
+
+    // Remember the landing URL (with utm_*) so it can be re-sent once consent is granted.
+    captureLanding()
 
     let loaded = false
     let trackersLoaded = false
@@ -102,8 +106,15 @@ export default function Analytics() {
 
     // Accepting later (banner) starts the consent-gated trackers right away.
     const onConsent = () => {
+      // If GA was already loaded, its landing page_view went out under denied consent
+      // and carried no campaign data: replay it now. If GA loads only now, its own
+      // page_view will carry consent, so a replay would be a duplicate.
+      const gaWasLoaded = loaded
       loadThirdParty()
-      if (getConsent() === 'granted') loadTrackers()
+      if (getConsent() === 'granted') {
+        loadTrackers()
+        flushLanding(gaWasLoaded)
+      }
     }
     window.addEventListener('sa-consent', onConsent)
 
