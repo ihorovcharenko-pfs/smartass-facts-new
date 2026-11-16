@@ -13,7 +13,7 @@ import {
   type ReactNode,
 } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { getOnboardingData } from '../utils/localStorage'
+import { getOnboardingData, setOnboardingData } from '../utils/localStorage'
 
 export type NavigateFn = (pathname: string, search?: string, replace?: boolean) => void
 
@@ -26,6 +26,8 @@ export interface AppContextValue {
   onGroupSelect: (groupId: number | null) => void
   onPlayClick: (category: string, source?: string) => void
   favouriteCategories: number[]
+  /** Add/remove a category from favourites (stored on this device). */
+  toggleFavourite: (categoryId: number) => void
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -44,6 +46,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // client render match (no hydration mismatch).
   useEffect(() => {
     setFavouriteCategories(getOnboardingData().favouriteCategoryIds)
+  }, [])
+
+  const toggleFavourite = useCallback((categoryId: number) => {
+    setFavouriteCategories(prev => {
+      const next = prev.includes(categoryId) ? prev.filter(id => id !== categoryId) : [...prev, categoryId]
+      setOnboardingData({ completed: true, favouriteCategoryIds: next })
+      return next
+    })
   }, [])
 
   const navigate = useCallback<NavigateFn>(
@@ -82,6 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     onGroupSelect,
     onPlayClick,
     favouriteCategories,
+    toggleFavourite,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

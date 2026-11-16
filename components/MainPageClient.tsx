@@ -5,10 +5,12 @@
 // server component (app/page.tsx). The grid is therefore present in the initial
 // SSR HTML — the whole point of the migration. Search/filter interactivity runs
 // client-side over the already-rendered list.
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import flagIcon from '../assets/flag.png'
 import { getImageUrl, getUserToken, type Group, type Category } from '../services/clientService'
 import { useApp } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
+import { track } from '../utils/analytics'
 import HowItWorksVideo from './HowItWorksVideo'
 import '../styles/MainPage.scss'
 
@@ -74,7 +76,38 @@ interface MainPageClientProps {
 }
 
 function MainPageClient({ groups, categories }: MainPageClientProps) {
-  const { searchText, onSearchChange, selectedGroupId, onGroupSelect, onPlayClick, favouriteCategories, navigate } = useApp()
+  const { searchText, onSearchChange, selectedGroupId, onGroupSelect, onPlayClick, favouriteCategories: storedFavourites, toggleFavourite, navigate } = useApp()
+  const { user, showAuthModal, openAuthModal } = useAuth()
+  // Favourites belong to signed-in players: the heart is live only when signed in, and the
+  // tile order / filled hearts only apply then (picks made before stay saved on the device).
+  const favouriteCategories = user ? storedFavourites : []
+
+  // A heart tapped while signed out opens sign-up; once they are signed in, that category is favourited.
+  const pendingFavourite = useRef<number | null>(null)
+  useEffect(() => {
+    if (user && pendingFavourite.current !== null) {
+      const id = pendingFavourite.current
+      pendingFavourite.current = null
+      if (!storedFavourites.includes(id)) toggleFavourite(id)
+    }
+  }, [user, storedFavourites, toggleFavourite])
+  useEffect(() => {
+    // Sign-up closed without signing in → forget the pending heart
+    if (showAuthModal || user) return
+    const t = setTimeout(() => { pendingFavourite.current = null }, 1500)
+    return () => clearTimeout(t)
+  }, [showAuthModal, user])
+
+  const onHeart = (categoryId: number, name: string) => {
+    if (!user) {
+      pendingFavourite.current = categoryId
+      track('favourite_signup_prompt', { category_name: name })
+      openAuthModal('register')
+      return
+    }
+    track('favourite_toggle', { category_name: name, action: favouriteCategories.includes(categoryId) ? 'remove' : 'add' })
+    toggleFavourite(categoryId)
+  }
 
   // Auth state is read from localStorage, which only exists in the browser.
   // Start logged-out for SSR/first paint, then update after mount.
@@ -234,6 +267,17 @@ function MainPageClient({ groups, categories }: MainPageClientProps) {
                           <img src={flagIcon.src} alt="Flag" className="category-card__flag-icon" />
                           <span className="category-card__start-text">Start here</span>
                         </div>
+                      )}
+                      {!isGameOfTheDay && (
+                        <button
+                          type="button"
+                          className={`category-card__heart${isFavourite ? ' is-on' : ''}`}
+                          aria-pressed={user ? isFavourite : undefined}
+                          aria-label={!user ? `Sign in to add ${category.saCategory} to favourites` : isFavourite ? `Remove ${category.saCategory} from favourites` : `Add ${category.saCategory} to favourites`}
+                          onClick={e => { e.stopPropagation(); onHeart(category.id, category.saCategory) }}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 2.6 5 6 5c2 0 3.4 1.1 4.2 2.4h.1C11.2 6.1 12.6 5 14.6 5c3.4 0 5.1 3.4 3.6 6.8C19.5 16.4 12 21 12 21z" transform="translate(0 .5)"/></svg>
+                        </button>
                       )}
                       {imgSrc ? (
                         <img

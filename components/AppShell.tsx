@@ -2,16 +2,15 @@
 
 // Persistent chrome: header on every route, footer everywhere except the
 // immersive game/battle/room routes (matching the old App.tsx), the global auth
-// modal, the first-visit onboarding modal, and the ?login=true deep link.
-import { useState, useEffect } from 'react'
+// modal and the ?login=true deep link. (The first-visit welcome/topics modals were removed:
+// the home-page video explains the game, and favourites are now a heart on each tile.)
+import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Header from './Header'
 import Footer from './Footer'
 import AuthModal from './AuthModal'
-import OnboardingModal from './OnboardingModal'
 import CookieBanner from './CookieBanner'
 import { useAuth } from '../context/AuthContext'
-import { getOnboardingData, setOnboardingData } from '../utils/localStorage'
 import '../styles/comic.scss'
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -19,18 +18,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // trailingSlash:true makes this '/game/' — normalise or the game/room checks never match
   const pathname = rawPath.length > 1 && rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath
   const { openAuthModal } = useAuth()
-  const [showOnboarding, setShowOnboarding] = useState(false)
 
   const isGameRoute =
     pathname === '/game' ||
     pathname.startsWith('/battle/') ||
     pathname.startsWith('/room')
-
-  // First-visit onboarding (localStorage is browser-only → check after mount so
-  // SSR and first client render agree).
-  useEffect(() => {
-    if (!getOnboardingData().completed) setShowOnboarding(true)
-  }, [])
 
   // ?login=true deep link → open the auth modal, then strip the param.
   useEffect(() => {
@@ -41,11 +33,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [openAuthModal])
 
-  const handleOnboardingComplete = (favouriteIds: number[]) => {
-    setOnboardingData({ completed: true, favouriteCategoryIds: favouriteIds })
-    setShowOnboarding(false)
-  }
-
   return (
     <div className="app">
       <Header />
@@ -55,7 +42,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {isGameRoute && (pathname === '/game' || pathname.startsWith('/room')) && (
         <div className="footer-desktop-only"><Footer /></div>
       )}
-      {showOnboarding && <OnboardingModal onComplete={handleOnboardingComplete} />}
       <AuthModal />
       <CookieBanner />
     </div>

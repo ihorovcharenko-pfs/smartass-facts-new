@@ -373,6 +373,51 @@
     border-color: rgba(240,96,48,0.35);
   }
 
+  // Favourite heart (top-right of the picture). 44px hit area, 34px visible disc.
+  &__heart {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(13, 13, 22, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(6px);
+      transition: background 0.15s, transform 0.15s;
+    }
+    svg {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      transition: fill 0.15s, stroke 0.15s, transform 0.15s;
+    }
+    &:hover::before { background: rgba(13, 13, 22, 0.9); }
+    &:active svg { transform: scale(0.88); }
+    &:focus-visible { outline: 3px solid #fff; outline-offset: -4px; border-radius: 50%; }
+    &.is-on svg { fill: #ff5c7a; stroke: #ff5c7a; }
+  }
+
   &__start-badge {
     position: absolute;
     top: 10px;
