@@ -14,6 +14,7 @@ import {
 } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { getOnboardingData, setOnboardingData } from '../utils/localStorage'
+import { setLaunchSource } from '../utils/launchSource'
 
 export type NavigateFn = (pathname: string, search?: string, replace?: boolean) => void
 
@@ -78,7 +79,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const onPlayClick = useCallback(
     (category: string, source = 'content_page') => {
-      router.push(`/game?cat=${encodeURIComponent(category)}&src=${encodeURIComponent(source)}`)
+      setLaunchSource(source)
+      router.push(`/game?cat=${encodeURIComponent(category)}`)
     },
     [router],
   )

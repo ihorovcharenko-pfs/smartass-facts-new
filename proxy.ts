@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import type { NextFetchEvent, NextRequest } from 'next/server'
+import { readCampaign } from './utils/campaign'
+import { postCampaignEvent } from './utils/campaignServer'
 import staticContentPaths from './static-content-paths.json'
 
 // Restored static SEO pages (myth/vs/topic/country/people/animal detail pages,
@@ -12,7 +14,21 @@ const STATIC_PAGES = new Set<string>(staticContentPaths)
 // never append a trailing slash to those.
 const isFile = (p: string) => /\.[a-z0-9]+$/i.test(p)
 
-export function proxy(request: NextRequest) {
+// Landings from campaign links (utm_source present) are counted server-side from the
+// page request itself: no script, cookie or storage on the visitor's device, and the
+// IP / user-agent are not kept (the user-agent is only checked to skip bots/previews).
+const BOT_RE = /bot|crawl|spider|slurp|preview|headless|lighthouse|pagespeed|facebookexternalhit|embedly|curl\/|wget\/|python-|node-fetch|axios|go-http-client|whatsapp|pinterest/i
+
+function countLanding(request: NextRequest, event: NextFetchEvent) {
+  if (request.method !== 'GET') return
+  if (request.nextUrl.searchParams.has('_rsc')) return // in-app navigation / prefetch, not a landing
+  if (!(request.headers.get('accept') ?? '').includes('text/html')) return
+  if (BOT_RE.test(request.headers.get('user-agent') ?? '')) return
+  const campaign = readCampaign(request.nextUrl.searchParams)
+  if (campaign) event.waitUntil(postCampaignEvent('landing', campaign))
+}
+
+export function proxy(request: NextRequest, event: NextFetchEvent) {
   const { pathname, searchParams } = request.nextUrl
 
   // Old homepage filter links (/?category=Design). The next.config redirect
@@ -39,6 +55,8 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, { status: 301 })
   }
 
+  countLanding(request, event)
+
   if (pathname.endsWith('/') && STATIC_PAGES.has(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = `${pathname}index.html`
@@ -49,5 +67,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/facts/:path*', '/about/:path*', '/embed/:path*'],
+  matcher: ['/', '/game/:path*', '/myths/:path*', '/vs/:path*', '/random/:path*', '/facts/:path*', '/about/:path*', '/embed/:path*'],
 }

@@ -12,6 +12,7 @@
 const GA_ID = 'G-MS3N10PT93'
 
 import { getConsent } from './consent'
+import { countCampaignEvent } from './campaign'
 
 export type GameMode = 'single' | 'daily' | 'battle' | 'party' | 'beat'
 
@@ -19,6 +20,8 @@ type EventParams = Record<string, string | number | boolean | undefined>
 
 export function track(event: string, params: EventParams = {}) {
   if (typeof window === 'undefined') return
+  // Cookieless aggregate campaign counter: no identifiers, so it runs regardless of consent.
+  if (event === 'game_start' || event === 'game_complete') countCampaignEvent(event)
   // Custom events are non-essential: only with explicit consent.
   if (getConsent() !== 'granted') return
   if (process.env.NODE_ENV !== 'production') {

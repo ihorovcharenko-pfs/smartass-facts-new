@@ -9,11 +9,15 @@
 import { useEffect } from 'react'
 import { getConsent } from '../utils/consent'
 import { captureLanding, flushLanding, setGaEnabled } from '../utils/landing'
+import { captureCampaign } from '../utils/campaign'
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 
 export default function Analytics() {
   useEffect(() => {
+    // Remember utm_* in memory so game events can be attributed after in-app navigation.
+    captureCampaign()
+
     if (!IS_PROD) return
 
     // Remember the landing URL (with utm_*) so it can be re-sent once consent is granted.

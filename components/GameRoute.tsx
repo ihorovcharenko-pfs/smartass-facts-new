@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import GamePage, { type BeatInfo } from './GamePage'
 import GamePageSkeleton from './GamePageSkeleton'
-import { fetchFactsForClient, fetchPersonalizedFacts, type Fact } from '../services/clientService'
+import { fetchFactsForClient, fetchFactById, fetchPersonalizedFacts, type Fact } from '../services/clientService'
 import { getSkipIds, getPoolId, getSessionToken } from '../utils/localStorage'
+import { getLaunchSource, setLaunchSource } from '../utils/launchSource'
 
 const GAME_PATH = '/game'
 const CAT_PARAM = 'cat'
@@ -15,8 +16,9 @@ function getCategoryFromUrl(): string | null {
   return params.get(CAT_PARAM)
 }
 
-function buildGameSearch(category: string, source?: string): string {
-  return `${CAT_PARAM}=${encodeURIComponent(category)}${source ? `&src=${encodeURIComponent(source)}` : ''}`
+// The launch source is kept in memory (utils/launchSource.ts), not in the URL.
+function buildGameSearch(category: string): string {
+  return `${CAT_PARAM}=${encodeURIComponent(category)}`
 }
 
 interface GameRouteProps {
@@ -33,7 +35,11 @@ function GameRoute({ navigate }: GameRouteProps) {
   // bounced every game launch back to the home page.
   const searchParams = useSearchParams()
   const category = searchParams.get(CAT_PARAM)
-  const source = searchParams.get('src') ?? 'direct'
+  // Recomputed per navigation (searchParams changes), never read from the URL.
+  const source = useMemo(() => getLaunchSource(), [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Optional &fact=<id>: show this fact first (e.g. a specific fact in a paid campaign).
+  const factParam = Number(searchParams.get('fact'))
+  const pinnedFactId = Number.isInteger(factParam) && factParam > 0 ? factParam : null
   const beatCode = searchParams.get('beat')
   // /beat/CODE stashes the challenge in sessionStorage before redirecting here
   const [beat, setBeat] = useState<BeatInfo | null>(null)
@@ -50,7 +56,7 @@ function GameRoute({ navigate }: GameRouteProps) {
 
   const FOR_YOU_CATEGORY = 'For You'
 
-  const loadFacts = useCallback(async (cat: string) => {
+  const loadFacts = useCallback(async (cat: string, pinnedId: number | null) => {
     const requestId = ++requestRef.current
     try {
       setLoadError(false)
@@ -80,6 +86,14 @@ function GameRoute({ navigate }: GameRouteProps) {
 
       if (requestId !== requestRef.current) return // a newer load superseded this one
       if (!facts || facts.length === 0) throw new Error('No facts returned')
+
+      // Pin the requested fact to the front, keeping the round the same length. If the
+      // fact can't be found the normal round is used.
+      if (pinnedId) {
+        const pinned = (await fetchFactById(pinnedId))?.fact as Fact | undefined
+        if (requestId !== requestRef.current) return
+        if (pinned) facts = [pinned, ...facts.filter(f => f.id !== pinned.id)].slice(0, facts.length)
+      }
       setGameFacts(facts)
     } catch (error) {
       console.error('Failed to fetch facts:', error)
@@ -96,8 +110,8 @@ function GameRoute({ navigate }: GameRouteProps) {
       return
     }
     setGameFacts([])
-    loadFacts(category)
-  }, [category, navigate, loadFacts])
+    loadFacts(category, pinnedFactId)
+  }, [category, pinnedFactId, navigate, loadFacts])
 
   const goHome = useCallback(() => {
     navigate('/')
@@ -113,7 +127,8 @@ function GameRoute({ navigate }: GameRouteProps) {
 
   const handlePlayAgain = useCallback(
     (cat: string) => {
-      navigate(GAME_PATH, buildGameSearch(cat, 'replay'))
+      setLaunchSource('replay')
+      navigate(GAME_PATH, buildGameSearch(cat))
     },
     [navigate]
   )
@@ -127,7 +142,7 @@ function GameRoute({ navigate }: GameRouteProps) {
       <div style={{ padding: '4rem 1.5rem', textAlign: 'center', color: 'var(--color-text)' }}>
         <h2 style={{ marginBottom: '0.5rem' }}>Couldn&apos;t load this game</h2>
         <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Check your connection and try again.</p>
-        <button className="results-screen__button results-screen__button--primary" style={{ marginRight: '0.5rem' }} onClick={() => loadFacts(category)}>Try again</button>
+        <button className="results-screen__button results-screen__button--primary" style={{ marginRight: '0.5rem' }} onClick={() => loadFacts(category, pinnedFactId)}>Try again</button>
         <button className="results-screen__button results-screen__button--secondary" onClick={goHome}>Back to home</button>
       </div>
     )

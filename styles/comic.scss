@@ -19,7 +19,7 @@
   background-color: var(--cp-navy);
   background-image: radial-gradient(var(--cp-dot) 2px, transparent 2px);
   background-size: 14px 14px;
-  min-height: calc(100dvh - 64px);
+  min-height: calc(100dvh - 64px - var(--cookie-banner-h, 0px));
   width: 100%;
   display: flex;
   justify-content: center;

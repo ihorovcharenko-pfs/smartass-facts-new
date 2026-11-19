@@ -13,8 +13,10 @@
 // The banner wording and the default consent state are not touched.
 import { getConsent } from './consent'
 
-const LANDING_KEY = 'sa_landing'
-const SENT_KEY = 'sa_landing_sent'
+// The landing is kept in JS memory only (no sessionStorage / cookies): nothing is
+// written to the visitor's device before consent. A full page reload forgets it.
+let pendingLanding: Landing | null = null
+let landingSettled = false
 const GA_ID = 'G-MS3N10PT93'
 
 type Landing = { url: string; referrer: string; title: string }
@@ -29,26 +31,16 @@ export function setGaEnabled(enabled: boolean) {
 // when consent is not already granted. A reload never overwrites it.
 export function captureLanding() {
   if (typeof window === 'undefined') return
-  try {
-    if (getConsent() === 'granted') return
-    if (sessionStorage.getItem(SENT_KEY) || sessionStorage.getItem(LANDING_KEY)) return
-    const landing: Landing = { url: location.href, referrer: document.referrer, title: document.title }
-    sessionStorage.setItem(LANDING_KEY, JSON.stringify(landing))
-  } catch {
-    /* private mode / storage blocked: attribution is best-effort */
-  }
+  if (getConsent() === 'granted') return
+  if (landingSettled || pendingLanding) return
+  pendingLanding = { url: location.href, referrer: document.referrer, title: document.title }
 }
 
 function consumeLanding(): Landing | null {
-  try {
-    const raw = sessionStorage.getItem(LANDING_KEY)
-    if (!raw) return null
-    sessionStorage.removeItem(LANDING_KEY)
-    sessionStorage.setItem(SENT_KEY, '1')
-    return JSON.parse(raw) as Landing
-  } catch {
-    return null
-  }
+  const l = pendingLanding
+  pendingLanding = null
+  landingSettled = true
+  return l
 }
 
 function pushPageView(l: Landing) {

@@ -5,6 +5,7 @@ import GamePage from './GamePage'
 import BattleResultsScreen from './BattleResultsScreen'
 import { fetchBattle, type BattleSession } from '../services/clientService'
 import { GAME_PATH, buildGameSearch } from './GameRoute'
+import { setLaunchSource } from '../utils/launchSource'
 import '../styles/Battle.scss'
 
 type BattleStatus = 'loading' | 'error' | 'intro' | 'playing' | 'results'
@@ -41,7 +42,8 @@ function BattleRoute({ battleId, navigate }: BattleRouteProps) {
 
   const handlePlayAgain = useCallback(() => {
     if (!battle) return
-    navigate(GAME_PATH, buildGameSearch(battle.category, 'battle'))
+    setLaunchSource('battle')
+    navigate(GAME_PATH, buildGameSearch(battle.category))
   }, [battle, navigate])
 
   const handleGoHome = useCallback(() => navigate('/'), [navigate])

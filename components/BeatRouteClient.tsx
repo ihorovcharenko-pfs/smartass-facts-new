@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Button from './comic/Button'
 import { fetchBeat } from '../services/clientService'
 import { track } from '../utils/analytics'
+import { setLaunchSource } from '../utils/launchSource'
 import '../styles/comic.scss'
 
 export default function BeatRouteClient({ code }: { code: string }) {
@@ -21,7 +22,8 @@ export default function BeatRouteClient({ code }: { code: string }) {
       if (!b) { setFailed(true); return }
       try { sessionStorage.setItem('sa_beat', JSON.stringify({ code: b.code, name: b.name, score: b.score, total: b.total })) } catch { /* private mode */ }
       track('challenge_link_opened', { code: b.code, category_name: b.category, category: b.category })
-      router.replace(`/game?cat=${encodeURIComponent(b.category)}&src=beat&beat=${b.code}`)
+      setLaunchSource('beat')
+      router.replace(`/game?cat=${encodeURIComponent(b.category)}&beat=${b.code}`)
     })
     return () => { alive = false }
   }, [code, router])
