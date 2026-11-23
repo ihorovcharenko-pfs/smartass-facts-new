@@ -10,7 +10,7 @@ import { useEffect } from 'react'
 import { getConsent } from '../utils/consent'
 import { captureLanding, flushLanding, setGaEnabled } from '../utils/landing'
 import { captureCampaign } from '../utils/campaign'
-import { applyInternalFlag } from '../utils/internal'
+import { applyInternalFlag, isInternal } from '../utils/internal'
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 
@@ -61,6 +61,7 @@ export default function Analytics() {
       // Amplitude + Metricool set cookies / record sessions → only with consent.
       loadTrackers = () => {
       if (trackersLoaded) return
+      if (isInternal()) return // owner's own devices: no Amplitude / Metricool
       trackersLoaded = true
       // Amplitude (session replay sampled at 10%)
       const amp = document.createElement('script')
