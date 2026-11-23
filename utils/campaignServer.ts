@@ -1,5 +1,5 @@
 // Server-only: forward one campaign count to the API (Postgres). Used by proxy.ts
-// (landings) and app/api/c/route.ts (game events). No identifiers are sent or kept.
+// (all events, via app/api/c/route.ts). No identifiers are sent or kept.
 import type { Campaign, CampaignEvent } from './campaign'
 
 const API = process.env.CAMPAIGN_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://api.smartassfacts.com'

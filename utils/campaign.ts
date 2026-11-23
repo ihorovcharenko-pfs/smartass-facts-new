@@ -1,13 +1,13 @@
 // Cookieless, aggregate-only campaign counter (client side + shared helpers).
 //
 // Counts per day + utm_source + utm_medium + utm_content for three events:
-//   landing       - counted server-side in proxy.ts from the page request itself
-//   game_start    - counted from the browser, only for visitors who arrived with utm_source
-//   game_complete - same
-// Nothing identifies a person: no cookies, no localStorage/sessionStorage, no user or
-// device IDs, no IP/user-agent stored. The campaign values live only in this module's
-// memory for the life of the page (lost on a full reload), and only the three
-// sanitised fields + the event name are sent. Counted regardless of analytics consent.
+//   landing       - once per tab session per campaign (browser beacon, see captureCampaign)
+//   game_start    - when a game starts, only for visitors who arrived with utm_source
+//   game_complete - when the results screen is reached, same
+// Nothing identifies a person: no cookies, no user or device IDs, no IP/user-agent
+// stored. The only device storage is one sessionStorage entry holding the three
+// sanitised campaign fields (cleared when the tab closes). Counted regardless of
+// analytics consent.
 export type CampaignEvent = 'landing' | 'game_start' | 'game_complete'
 export type Campaign = { s: string; m: string; c: string }
 
@@ -29,22 +29,16 @@ export function readCampaign(params: URLSearchParams): Campaign | null {
 }
 
 // ── browser only ─────────────────────────────────────────────────────────────
+// sessionStorage key (this tab only, gone when the tab closes). It holds ONLY the three
+// sanitised campaign fields: no ID, no timestamp, no personal data. It makes a reload or
+// back-navigation count as the same landing, and keeps game events attributed to the
+// campaign the tab arrived with even if the URL later loses its utm_* parameters.
+const KEY = 'sa_cc'
 let captured = false
 let campaign: Campaign | null = null
 
-// Call once as early as possible (components/Analytics.tsx). Remembers the landing
-// campaign in memory so it survives in-app navigation (/ -> /game).
-export function captureCampaign() {
-  if (typeof window === 'undefined' || captured) return
-  captured = true
-  campaign = readCampaign(new URLSearchParams(window.location.search))
-}
-
-export function countCampaignEvent(event: Exclude<CampaignEvent, 'landing'>) {
-  if (typeof window === 'undefined') return
-  captureCampaign() // fallback if nothing captured yet (e.g. direct landing on /game)
-  if (!campaign) return
-  const payload = JSON.stringify({ e: event, ...campaign })
+function send(event: CampaignEvent, c: Campaign) {
+  const payload = JSON.stringify({ e: event, ...c })
   if (process.env.NODE_ENV !== 'production') {
     console.debug('[campaign-count]', payload)
     return
@@ -55,4 +49,35 @@ export function countCampaignEvent(event: Exclude<CampaignEvent, 'landing'>) {
   } catch {
     /* counting must never break the game */
   }
+}
+
+// Call once as early as possible (components/Analytics.tsx). Remembers the campaign for
+// this tab and counts ONE landing per tab session per campaign.
+export function captureCampaign() {
+  if (typeof window === 'undefined' || captured) return
+  captured = true
+  const fromUrl = readCampaign(new URLSearchParams(window.location.search))
+  let stored: Campaign | null = null
+  try {
+    const raw = sessionStorage.getItem(KEY)
+    if (raw) { const o = JSON.parse(raw); stored = normalizeCampaign(o?.s, o?.m, o?.c) }
+  } catch { /* storage blocked: fall back to in-memory only */ }
+
+  if (fromUrl) {
+    campaign = fromUrl
+    const same = !!stored && stored.s === fromUrl.s && stored.m === fromUrl.m && stored.c === fromUrl.c
+    if (!same) {
+      try { sessionStorage.setItem(KEY, JSON.stringify(fromUrl)) } catch { /* ignore */ }
+      send('landing', fromUrl) // new campaign in this tab -> exactly one landing
+    }
+  } else {
+    campaign = stored // later page loads in the tab keep the original campaign
+  }
+}
+
+export function countCampaignEvent(event: Exclude<CampaignEvent, 'landing'>) {
+  if (typeof window === 'undefined') return
+  captureCampaign() // fallback if nothing captured yet
+  if (!campaign) return
+  send(event, campaign)
 }
