@@ -10,11 +10,15 @@ import { useEffect } from 'react'
 import { getConsent } from '../utils/consent'
 import { captureLanding, flushLanding, setGaEnabled } from '../utils/landing'
 import { captureCampaign } from '../utils/campaign'
+import { applyInternalFlag } from '../utils/internal'
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 
 export default function Analytics() {
   useEffect(() => {
+    // Owner's own devices: ?internal=1 / ?internal=0 (must run before anything is counted or sent)
+    applyInternalFlag()
+
     // Remember utm_* in memory so game events can be attributed after in-app navigation.
     captureCampaign()
 
@@ -39,6 +43,8 @@ export default function Analytics() {
         // Consent mode: analytics DENIED until the visitor accepts (stored choice restored here)
         "gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});" +
         "try{if(localStorage.getItem('sa_consent')==='granted')gtag('consent','update',{analytics_storage:'granted'});}catch(e){}" +
+        // Internal traffic (owner's devices): every GA4 hit carries traffic_type=internal
+        "try{if(localStorage.getItem('sa_internal')==='1')gtag('set',{traffic_type:'internal'});}catch(e){}" +
         "gtag('js',new Date());gtag('config','G-MS3N10PT93',{send_page_view:false});" +
         "(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-KBFTJDH2');"
       document.head.appendChild(gtm)

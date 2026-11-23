@@ -12,6 +12,7 @@
 //    session with the campaign data.
 // The banner wording and the default consent state are not touched.
 import { getConsent } from './consent'
+import { isInternal } from './internal'
 
 // The landing is kept in JS memory only (no sessionStorage / cookies): nothing is
 // written to the visitor's device before consent. A full page reload forgets it.
@@ -49,6 +50,7 @@ function pushPageView(l: Landing) {
     page_referrer: l.referrer || undefined,
     page_title: l.title || undefined,
     send_to: GA_ID,
+    ...(isInternal() ? { traffic_type: 'internal' } : {}),
   }
   if (process.env.NODE_ENV !== 'production') {
     console.debug('[analytics] page_view', params)

@@ -8,6 +8,8 @@
 // stored. The only device storage is one sessionStorage entry holding the three
 // sanitised campaign fields (cleared when the tab closes). Counted regardless of
 // analytics consent.
+import { isInternal } from './internal'
+
 export type CampaignEvent = 'landing' | 'game_start' | 'game_complete'
 export type Campaign = { s: string; m: string; c: string }
 
@@ -38,6 +40,7 @@ let captured = false
 let campaign: Campaign | null = null
 
 function send(event: CampaignEvent, c: Campaign) {
+  if (isInternal()) return // owner's own devices are never counted
   const payload = JSON.stringify({ e: event, ...c })
   if (process.env.NODE_ENV !== 'production') {
     console.debug('[campaign-count]', payload)
@@ -56,6 +59,7 @@ function send(event: CampaignEvent, c: Campaign) {
 export function captureCampaign() {
   if (typeof window === 'undefined' || captured) return
   captured = true
+  if (isInternal()) return // no counting, no tab storage
   const fromUrl = readCampaign(new URLSearchParams(window.location.search))
   let stored: Campaign | null = null
   try {

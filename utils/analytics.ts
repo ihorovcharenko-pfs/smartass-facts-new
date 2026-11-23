@@ -12,6 +12,7 @@
 const GA_ID = 'G-MS3N10PT93'
 
 import { getConsent } from './consent'
+import { isInternal } from './internal'
 import { countCampaignEvent } from './campaign'
 
 export type GameMode = 'single' | 'daily' | 'battle' | 'party' | 'beat'
@@ -33,7 +34,7 @@ export function track(event: string, params: EventParams = {}) {
     w.dataLayer = w.dataLayer || []
     // gtag.js only understands `arguments` objects, not plain arrays.
     // eslint-disable-next-line prefer-rest-params
-    ;(function gtag(..._a: unknown[]) { w.dataLayer!.push(arguments) })('event', event, { ...params, send_to: GA_ID })
+    ;(function gtag(..._a: unknown[]) { w.dataLayer!.push(arguments) })('event', event, { ...params, ...(isInternal() ? { traffic_type: 'internal' } : {}), send_to: GA_ID })
   } catch {
     /* analytics must never break the game */
   }
