@@ -264,6 +264,15 @@
   }
   &.is-animating &__needle { animation: cp-needle 600ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 }
+// Short phone screens (e.g. 375x560, or taller ones with the cookie banner open): shrink the
+// meter in proportion to the height that is really available, so the verdict line
+// (NAILED IT / BUSTED) and its subline stay visible above the NEXT FACT bar.
+// usable height = viewport - cookie banner; full size (360px) is reached at ~ 580px usable.
+@media (max-height: 700px) {
+  .cp-game:has(.cp-action-bar) .cp-meter {
+    width: min(100%, clamp(150px, calc((100dvh - var(--cookie-banner-h, 0px) - 340px) * 1.5), 360px));
+  }
+}
 @keyframes cp-needle {
   0% { transform: rotate(0deg); }
   72% { transform: rotate(calc(var(--cp-needle-final) * 1.14)); }
@@ -312,6 +321,9 @@
   margin: 0 -16px -24px;               // bleed over the column padding, keep the bar flush at the end
   padding: 14px 16px calc(24px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(to top, var(--cp-navy) 72%, rgba(0, 0, 0, 0));
+}
+@media (max-height: 700px) {
+  .cp-action-bar { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); } // less dead space on short screens
 }
 
 .cp-row { display: flex; gap: 12px; }
