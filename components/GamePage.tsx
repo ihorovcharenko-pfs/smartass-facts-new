@@ -13,6 +13,7 @@ import MascotBubble from './comic/MascotBubble'
 import { type Fact, playStreak, fetchStreak, logInteractions, submitGameResult, createBattle } from '../services/clientService'
 import { decryptAnswer } from '../utils/decryption'
 import { bestStreak } from '../utils/tiers'
+import { countCampaignEvent } from '../utils/campaign'
 import { addSkipIds, incrementPoolId, getSessionToken, getSoundEnabled, setSoundEnabled } from '../utils/localStorage'
 import { playCorrect, playWrong, warmAudio } from '../utils/sounds'
 import '../styles/comic.scss'
@@ -110,6 +111,10 @@ function GamePage({ facts, category, source = 'direct', beat = null, onBack, onC
     lockInput()
     setUserAnswer(userChoice)
     setIsAnswered(true)
+    // Cookieless funnel counter: how far campaign visitors get (1st, 3rd, 5th, 8th answer)
+    if (currentStep === 1 || currentStep === 3 || currentStep === 5 || currentStep === 8) {
+      countCampaignEvent(`answered_${currentStep}` as 'answered_1')
+    }
 
     try {
       const correctAnswer = await decryptAnswer(currentFact.answer)
@@ -194,10 +199,16 @@ function GamePage({ facts, category, source = 'direct', beat = null, onBack, onC
     setCurrentStep(1); setIsAnswered(false); setIsCorrect(false); setUserAnswer(null); setFactIsReal(null); setShowResult(false)
     setAnswers([])
     completedTrackedRef.current = false
+    countCampaignEvent('play_again_click')
     track('game_replay', { category_name: category, mode: gameMode })
     track('rematch', { same_category: true, mode: gameMode })
     onPlayAgain?.(category)
   }
+
+  // Results screen actually shown (cookieless campaign counter)
+  useEffect(() => {
+    if (showResultsDialog) countCampaignEvent('results_shown')
+  }, [showResultsDialog])
 
   // Pass modal after the summary if a daily streak broke
   useEffect(() => {

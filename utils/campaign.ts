@@ -4,13 +4,19 @@
 //   landing       - once per tab session per campaign (browser beacon, see captureCampaign)
 //   game_start    - when a game starts, only for visitors who arrived with utm_source
 //   game_complete - when the results screen is reached, same
+//   answered_1/3/5/8, results_shown, play_again_click - progress events, same attribution
 // Nothing identifies a person: no cookies, no user or device IDs, no IP/user-agent
 // stored. The only device storage is one sessionStorage entry holding the three
 // sanitised campaign fields (cleared when the tab closes). Counted regardless of
 // analytics consent.
 import { isInternal } from './internal'
 
-export type CampaignEvent = 'landing' | 'game_start' | 'game_complete'
+export type CampaignEvent =
+  | 'landing' | 'game_start' | 'game_complete'
+  | 'answered_1' | 'answered_3' | 'answered_5' | 'answered_8' | 'results_shown' | 'play_again_click'
+export const GAME_EVENTS: readonly CampaignEvent[] = [
+  'game_start', 'game_complete', 'answered_1', 'answered_3', 'answered_5', 'answered_8', 'results_shown', 'play_again_click',
+]
 export type Campaign = { s: string; m: string; c: string }
 
 const NONE = '(none)'
