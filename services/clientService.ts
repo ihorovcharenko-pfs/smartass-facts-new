@@ -1,6 +1,8 @@
 
 // Works in both the browser and on the server (SSR). Defaults to the live API;
 // override with NEXT_PUBLIC_API_BASE_URL (e.g. http://localhost:3000) for local API dev.
+import { safeLocal, safeSession } from '../utils/safeStorage'
+
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.smartassfacts.com";
 
@@ -44,9 +46,9 @@ export interface Fact {
 
 export const fetchGroups = async (): Promise<Group[]> => {
   const cacheKey = 'groups'
-  const cached = sessionStorage.getItem(cacheKey)
+  const cached = safeSession.get(cacheKey)
   if (cached) {
-    try { return JSON.parse(cached) } catch { sessionStorage.removeItem(cacheKey) }
+    try { return JSON.parse(cached) } catch { safeSession.remove(cacheKey) }
   }
 
   // Consume the prefetched promise if available (started before React booted)
@@ -57,15 +59,15 @@ export const fetchGroups = async (): Promise<Group[]> => {
   const response = await responseProm
   if (!response.ok) throw new Error('Failed to fetch groups')
   const data = await response.json()
-  sessionStorage.setItem(cacheKey, JSON.stringify(data))
+  safeSession.set(cacheKey, JSON.stringify(data))
   return data
 }
 
 export const fetchCategories = async (): Promise<Category[]> => {
   const cacheKey = 'categories'
-  const cached = sessionStorage.getItem(cacheKey)
+  const cached = safeSession.get(cacheKey)
   if (cached) {
-    try { return JSON.parse(cached) } catch { sessionStorage.removeItem(cacheKey) }
+    try { return JSON.parse(cached) } catch { safeSession.remove(cacheKey) }
   }
 
   // Consume the prefetched promise if available (started before React booted)
@@ -76,7 +78,7 @@ export const fetchCategories = async (): Promise<Category[]> => {
   const response = await responseProm
   if (!response.ok) throw new Error('Failed to fetch categories')
   const data = await response.json()
-  sessionStorage.setItem(cacheKey, JSON.stringify(data))
+  safeSession.set(cacheKey, JSON.stringify(data))
   return data
 }
 
@@ -128,7 +130,7 @@ interface AuthResponse {
 }
 
 export const getUserToken = (): string | null =>
-  localStorage.getItem(USER_TOKEN_KEY)
+  safeLocal.get(USER_TOKEN_KEY)
 
 export const registerUser = async (
   email: string,
@@ -142,7 +144,7 @@ export const registerUser = async (
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Registration failed')
-  localStorage.setItem(USER_TOKEN_KEY, data.token)
+  safeLocal.set(USER_TOKEN_KEY, data.token)
   return data
 }
 
@@ -157,7 +159,7 @@ export const loginUser = async (
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Login failed')
-  localStorage.setItem(USER_TOKEN_KEY, data.token)
+  safeLocal.set(USER_TOKEN_KEY, data.token)
   return data
 }
 
@@ -168,14 +170,14 @@ export const fetchCurrentUser = async (): Promise<User | null> => {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (!res.ok) {
-    localStorage.removeItem(USER_TOKEN_KEY)
+    safeLocal.remove(USER_TOKEN_KEY)
     return null
   }
   return res.json()
 }
 
 export const logoutUser = (): void => {
-  localStorage.removeItem(USER_TOKEN_KEY)
+  safeLocal.remove(USER_TOKEN_KEY)
 }
 
 export const googleSignIn = async (credential: string): Promise<AuthResponse> => {
@@ -186,7 +188,7 @@ export const googleSignIn = async (credential: string): Promise<AuthResponse> =>
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Google sign-in failed')
-  localStorage.setItem(USER_TOKEN_KEY, data.token)
+  safeLocal.set(USER_TOKEN_KEY, data.token)
   return data
 }
 

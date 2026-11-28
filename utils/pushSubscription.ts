@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../services/clientService'
+import { safeLocal } from './safeStorage'
 
 const PUSH_DISMISSED_KEY = 'sa_push_dismissed'
 const PUSH_SUBSCRIBED_KEY = 'sa_push_subscribed'
@@ -6,17 +7,17 @@ const PUSH_SUBSCRIBED_KEY = 'sa_push_subscribed'
 /** Has the user already subscribed or permanently dismissed the prompt? */
 export function isPushSeen(): boolean {
   return (
-    localStorage.getItem(PUSH_DISMISSED_KEY) === '1' ||
-    localStorage.getItem(PUSH_SUBSCRIBED_KEY) === '1'
+    safeLocal.get(PUSH_DISMISSED_KEY) === '1' ||
+    safeLocal.get(PUSH_SUBSCRIBED_KEY) === '1'
   )
 }
 
 export function markPushDismissed() {
-  localStorage.setItem(PUSH_DISMISSED_KEY, '1')
+  safeLocal.set(PUSH_DISMISSED_KEY, '1')
 }
 
 export function markPushSubscribed() {
-  localStorage.setItem(PUSH_SUBSCRIBED_KEY, '1')
+  safeLocal.set(PUSH_SUBSCRIBED_KEY, '1')
 }
 
 /** True if the browser supports web push at all. */
