@@ -301,6 +301,19 @@
 
 .cp-spacer { flex: 1 1 auto; min-height: 8px; }
 
+// Reveal screen: NEXT FACT / SEE RESULTS stays on screen. Sticky to the bottom of the
+// viewport (above the cookie banner when it is showing, via --cookie-banner-h, and above
+// the iOS home indicator). It is also in normal flow, so when the page is scrolled to the
+// end the story card's last line sits above it. The card can scroll under the bar.
+.cp-action-bar {
+  position: sticky;
+  bottom: var(--cookie-banner-h, 0px);
+  z-index: 20;
+  margin: 0 -16px -24px;               // bleed over the column padding, keep the bar flush at the end
+  padding: 14px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--cp-navy) 72%, rgba(0, 0, 0, 0));
+}
+
 .cp-row { display: flex; gap: 12px; }
 .cp-row > * { flex: 1; }
 

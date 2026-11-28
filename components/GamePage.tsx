@@ -325,9 +325,11 @@ function GamePage({ facts, category, source = 'direct', beat = null, onBack, onC
 
             <div className="cp-spacer" />
 
-            <Button variant="yellow" block style={{ pointerEvents: inputLocked ? 'none' : undefined }} onClick={handleNext}>
-              {currentStep === totalSteps ? 'SEE RESULTS' : 'NEXT FACT'}
-            </Button>
+            <div className="cp-action-bar">
+              <Button variant="yellow" block style={{ pointerEvents: inputLocked ? 'none' : undefined }} onClick={handleNext}>
+                {currentStep === totalSteps ? 'SEE RESULTS' : 'NEXT FACT'}
+              </Button>
+            </div>
           </>
         )}
       </div>
